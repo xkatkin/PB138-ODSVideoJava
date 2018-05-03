@@ -7,9 +7,6 @@ import java.util.Set;
 
 public class Movie implements Serializable {
 
-    enum Status {
-        AVAILABLE, RENTED, LOST
-    }
 
     private String name;
 
