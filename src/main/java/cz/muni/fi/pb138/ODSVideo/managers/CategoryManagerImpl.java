@@ -6,6 +6,7 @@ import cz.muni.fi.pb138.ODSVideo.models.Category;
 import cz.muni.fi.pb138.ODSVideo.models.Movie;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -94,17 +95,19 @@ public class CategoryManagerImpl implements CategoryManager {
 
     @Override
     public Collection<Category> findAllCategories() {
-        return categories.values();
+        return Collections.unmodifiableCollection(categories.values());
     }
 
     @Override
     public Collection<Movie> findAllMovies() {
-        return categories
+        return Collections.unmodifiableCollection(
+                categories
                 .values()
                 .stream()
                 .map(category -> new MovieManagerImpl().findAllMovies(category))
                 .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet())
+                );
 
     }
 
