@@ -1,25 +1,45 @@
 package cz.muni.fi.pb138.ODSVideo.managers;
 
+import cz.muni.fi.pb138.ODSVideo.exceptions.IllegalEntityException;
+import cz.muni.fi.pb138.ODSVideo.exceptions.ValidationException;
 import cz.muni.fi.pb138.ODSVideo.models.Category;
 import cz.muni.fi.pb138.ODSVideo.models.Movie;
 import cz.muni.fi.pb138.ODSVideo.models.Status;
 
 import java.time.Year;
 import java.util.Collection;
+import java.util.Set;
 
 public class MovieManagerImpl implements MovieManager{
     @Override
-    public void createMovie(Category category, Movie movie) {
-
+    public void createMovie(Category category, Movie movie) throws ValidationException {
+        if (category == null || movie == null) {
+            throw new IllegalArgumentException("input arguments cannot be null");
+        }
+        if (!isValid(movie)) {
+            throw new ValidationException("movie not valid");
+        }
+        if (movie.getStatus() == null) {
+            movie.setStatus(Status.AVAILABLE);
+        }
+        Set<Movie> movieSet = category.getMovies();
+        if(movieSet.contains(movie)) {
+            movieSet.remove(movie);
+        }
+        movieSet.add(movie);
     }
 
     @Override
     public void deleteMovie(Category category, String name) {
+        if (category == null || name == null) {
+            throw new IllegalArgumentException("input arguments cannot be null");
+        }
 
+        category.getMovies().remove(findMovie(category,name));
     }
 
     @Override
-    public void updateMovie(Category category, Movie movie) {
+    public void updateMovie(Category category, Movie movie) throws ValidationException, IllegalEntityException {
 
     }
 
@@ -51,5 +71,10 @@ public class MovieManagerImpl implements MovieManager{
     @Override
     public Collection<Movie> findAllMovies(Category category) {
         return null;
+    }
+
+    private boolean isValid(Movie movie) {
+        return movie.getActors() != null && movie.getLength() >= 0 && movie.getName() != null
+                && movie.getReleaseYear() != null;
     }
 }
