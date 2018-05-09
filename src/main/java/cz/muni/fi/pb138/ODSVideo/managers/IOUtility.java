@@ -47,7 +47,7 @@ public interface IOUtility {
     /**
      * Transforms .ods document into map of categories and its names as key
      * @param document document to transformed
-     * @throws IllegalArgumentException if document is null
+     * @throws IllegalArgumentException if document is null or document parsing failed
      * @return map of categories containing data from document
      */
     Map<String,Category> transformToMap(SpreadsheetDocument document);
