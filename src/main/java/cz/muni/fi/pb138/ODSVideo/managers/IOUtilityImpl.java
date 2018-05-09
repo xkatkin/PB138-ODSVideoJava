@@ -10,7 +10,13 @@ import org.odftoolkit.simple.table.Table;
 import java.io.File;
 import java.io.IOException;
 import java.time.Year;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class IOUtilityImpl implements IOUtility{
     @Override
@@ -79,7 +85,30 @@ public class IOUtilityImpl implements IOUtility{
 
     @Override
     public SpreadsheetDocument transformToDocument(Map<String, Category> categoryMap) {
-        return null;
+        SpreadsheetDocument document = null;
+        try {
+            document = SpreadsheetDocument.newSpreadsheetDocument();
+        } catch (Exception e) {
+            //shouldn't happen
+            e.printStackTrace();
+        }
+        // TODO: 09/05/2018 shouldn't happen, ill think of something
+        if (document == null) {
+            throw new IllegalArgumentException("dunno");
+        }
+
+        document.removeSheet(0);
+        for (Map.Entry<String, Category> entry : categoryMap.entrySet()) {
+            Table table = document.appendSheet(entry.getKey());
+            table.removeRowsByIndex(0,2);
+            int tableCount = table.getRowCount();
+            writeFirstRow(table.appendRow());
+            Set<Movie> movies = entry.getValue().getMovies();
+            for (Movie movie:movies) {
+                parseMovie(table.appendRow(),movie);
+            }
+        }
+        return document;
     }
 
     private List<Row> ignoreFirstRow(List<Row> list) {
@@ -134,5 +163,24 @@ public class IOUtilityImpl implements IOUtility{
         movie.setActors(actors);
         movie.setReleaseYear(releaseYear);
         return movie;
+    }
+
+    private void writeFirstRow(Row row) {
+        row.getCellByIndex(0).setDisplayText("name");
+        row.getCellByIndex(1).setDisplayText("length");
+        row.getCellByIndex(2).setDisplayText("actors");
+        row.getCellByIndex(3).setDisplayText("status");
+        row.getCellByIndex(4).setDisplayText("releaseYear");
+    }
+
+    private void parseMovie(Row row, Movie movie) {
+        row.getCellByIndex(0).setDisplayText(movie.getName());
+        row.getCellByIndex(1).setFormatString("0");
+        row.getCellByIndex(1).setDisplayText(Integer.toString(movie.getLength()));
+        row.getCellByIndex(2).setDisplayText(String.join(";",movie.getActors()));
+        row.getCellByIndex(3).setDisplayText(movie.getStatus().toString());
+        row.getCellByIndex(4).setFormatString("0");
+        row.getCellByIndex(4).setDisplayText(Integer.toString(movie.getReleaseYear().getValue()));
+
     }
 }
