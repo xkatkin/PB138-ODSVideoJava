@@ -26,5 +26,10 @@
             <artifactId>simple-odf</artifactId>
             <version>0.8.2-incubating</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>RELEASE</version>
+        </dependency>
     </dependencies>
 </project>
