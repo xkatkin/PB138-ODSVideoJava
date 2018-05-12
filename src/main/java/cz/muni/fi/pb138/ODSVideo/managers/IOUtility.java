@@ -56,7 +56,7 @@ public interface IOUtility {
      * Transforms map of categories to SpreadsheetDocument format
      * @param categoryMap map to be transformed
      * @throws IllegalArgumentException if map is null
-     * @return SpreadsheetDocument containg data from map
+     * @return SpreadsheetDocument containing data from map
      */
     SpreadsheetDocument transformToDocument(Map<String,Category> categoryMap);
 

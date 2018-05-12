@@ -111,7 +111,7 @@ public class IOUtilityImpl implements IOUtility{
         return document;
     }
 
-    private List<Row> ignoreFirstRow(List<Row> list) {
+    private static List<Row> ignoreFirstRow(List<Row> list) {
         if (list == null || list.size() == 0) {
             return list;
         }
@@ -119,7 +119,7 @@ public class IOUtilityImpl implements IOUtility{
         return list;
     }
 
-    private Status parseStatus(String input) {
+    private static Status parseStatus(String input) {
         input = input.toUpperCase();
         switch (input) {
             case "AVAILABLE":
@@ -133,7 +133,7 @@ public class IOUtilityImpl implements IOUtility{
         }
     }
 
-    private Movie parseRow(Row row) {
+    private static Movie parseRow(Row row) {
         String name = row.getCellByIndex(0).getDisplayText();
         int length;
         try {
@@ -155,7 +155,7 @@ public class IOUtilityImpl implements IOUtility{
         return movieQOLConstructor(name,length,actors,status,releaseYear);
     }
 
-    private Movie movieQOLConstructor(String name, int length, Set<String> actors, Status status, Year releaseYear) {
+    private static Movie movieQOLConstructor(String name, int length, Set<String> actors, Status status, Year releaseYear) {
         Movie movie = new Movie();
         movie.setName(name);
         movie.setStatus(status);
@@ -165,7 +165,7 @@ public class IOUtilityImpl implements IOUtility{
         return movie;
     }
 
-    private void writeFirstRow(Row row) {
+    private static void writeFirstRow(Row row) {
         row.getCellByIndex(0).setDisplayText("name");
         row.getCellByIndex(1).setDisplayText("length");
         row.getCellByIndex(2).setDisplayText("actors");
@@ -173,7 +173,7 @@ public class IOUtilityImpl implements IOUtility{
         row.getCellByIndex(4).setDisplayText("releaseYear");
     }
 
-    private void parseMovie(Row row, Movie movie) {
+    private static void parseMovie(Row row, Movie movie) {
         row.getCellByIndex(0).setDisplayText(movie.getName());
         row.getCellByIndex(1).setFormatString("0");
         row.getCellByIndex(1).setDisplayText(Integer.toString(movie.getLength()));
