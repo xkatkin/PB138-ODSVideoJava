@@ -3,15 +3,15 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox prefHeight="926.0" prefWidth="1228.0" xmlns="http://javafx.com/javafx/8.0.141"
-      xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="main" prefHeight="926.0" prefWidth="1228.0" xmlns="http://javafx.com/javafx/8.0.141"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="cz.muni.fi.pb138.ODSVideo.gui.AppController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
         <Menu mnemonicParsing="false" text="File">
           <items>
             <MenuItem mnemonicParsing="false" text="New" />
-            <MenuItem mnemonicParsing="false" text="Open…" />
+              <MenuItem mnemonicParsing="false" onAction="#selectFile" text="Open…"/>
             <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Save" />
             <MenuItem mnemonicParsing="false" text="Save As…" />
@@ -30,7 +30,8 @@
          <children>
              <VBox alignment="CENTER_LEFT" prefHeight="813.0" prefWidth="437.0" HBox.hgrow="ALWAYS">
                <children>
-                  <ChoiceBox prefHeight="26.0" prefWidth="374.0" />
+                   <ComboBox fx:id="globalCategorySelector" disable="true" onAction="#selectCategory" prefHeight="26.0"
+                             prefWidth="739.0" promptText="Select movie category..."/>
                    <HBox alignment="CENTER_LEFT" prefHeight="112.0" prefWidth="370.0" spacing="10.0"
                          VBox.vgrow="ALWAYS">
                      <children>
@@ -39,7 +40,7 @@
                         <Button mnemonicParsing="false" text="Rename" />
                      </children>
                   </HBox>
-                   <ListView prefHeight="653.0" prefWidth="384.0"/>
+                   <ListView fx:id="movieSelector" prefHeight="653.0" prefWidth="384.0"/>
                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
                         <Button mnemonicParsing="false" text="New" />
@@ -72,19 +73,20 @@
                      <Label text="Release year" GridPane.rowIndex="4"/>
                      <Label text="Status" GridPane.rowIndex="5"/>
                      <TextField GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                     <TextField GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                     <TextField GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <TextField fx:id="movieName" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                     <TextField fx:id="movieLength" GridPane.columnIndex="1" GridPane.rowIndex="2">
                          <GridPane.margin>
                              <Insets/>
                          </GridPane.margin>
                      </TextField>
-                     <TextField GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-                     <TextField GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-                     <TextField GridPane.columnIndex="1" GridPane.rowIndex="5"/>
-                     <ChoiceBox prefHeight="26.0" prefWidth="640.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
+                     <TextField fx:id="movieActors" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                     <TextField fx:id="movieRelease" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                     <TextField fx:id="movieStatus" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
                      <Label text="Genre"/>
                      <Button alignment="CENTER" mnemonicParsing="false" prefHeight="48.0" prefWidth="110.0" text="Save"
                              GridPane.rowIndex="6"/>
+                     <ComboBox fx:id="localCategorySelector" disable="true" prefHeight="26.0" prefWidth="594.0"
+                               GridPane.columnIndex="1"/>
                  </children>
              </GridPane>
          </children>
