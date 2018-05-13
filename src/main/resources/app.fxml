@@ -81,12 +81,13 @@
                      </TextField>
                      <TextField fx:id="movieActors" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
                      <TextField fx:id="movieRelease" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-                     <TextField fx:id="movieStatus" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
                      <Label text="Genre"/>
                      <Button alignment="CENTER" mnemonicParsing="false" prefHeight="48.0" prefWidth="110.0" text="Save"
                              GridPane.rowIndex="6"/>
                      <ComboBox fx:id="localCategorySelector" disable="true" prefHeight="26.0" prefWidth="594.0"
                                GridPane.columnIndex="1"/>
+                     <ComboBox fx:id="movieStatus" disable="true" prefHeight="26.0" prefWidth="628.0"
+                               GridPane.columnIndex="1" GridPane.rowIndex="5"/>
                  </children>
              </GridPane>
          </children>

@@ -3,6 +3,7 @@ package cz.muni.fi.pb138.ODSVideo.gui;
 import cz.muni.fi.pb138.ODSVideo.managers.*;
 import cz.muni.fi.pb138.ODSVideo.models.Category;
 import cz.muni.fi.pb138.ODSVideo.models.Movie;
+import cz.muni.fi.pb138.ODSVideo.models.Status;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -44,7 +45,7 @@ public class AppController {
     private TextField movieRelease;
 
     @FXML
-    private TextField movieStatus;
+    private ComboBox<Status> movieStatus;
 
 
     private SpreadsheetDocument database;
@@ -89,6 +90,8 @@ public class AppController {
                 selectMovie(newValue);
             }
         });
+
+        movieStatus.setItems(FXCollections.observableArrayList(Status.values()));
     }
 
     @FXML
@@ -119,19 +122,21 @@ public class AppController {
     @FXML
     private void selectCategory() {
         selectedCategory = globalCategorySelector.getValue();
-        movieSelector.setItems(FXCollections.observableArrayList(selectedCategory.getMovies()));
+        if (selectedCategory != null)
+            movieSelector.setItems(FXCollections.observableArrayList(selectedCategory.getMovies()));
     }
 
     @FXML
     private void selectMovie(Movie movie) {
         selectedMovie = movie;
         localCategorySelector.setDisable(false);
+        movieStatus.setDisable(false);
         localCategorySelector.getSelectionModel().select(selectedCategory);
 
         movieName.setText(selectedMovie.getName());
         movieLength.setText(String.valueOf(selectedMovie.getLength()));
         movieActors.setText(String.join(", ", selectedMovie.getActors()));
         movieRelease.setText(String.valueOf(selectedMovie.getReleaseYear()));
-        movieStatus.setText(selectedMovie.getStatus().toString());
+        movieStatus.getSelectionModel().select(selectedMovie.getStatus());
     }
 }
