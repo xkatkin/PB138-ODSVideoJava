@@ -1,4 +1,4 @@
-package sample;
+package cz.muni.fi.pb138.ODSVideo.gui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -6,13 +6,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class Main extends Application {
+public class VideoManagerApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 300, 275));
+        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("app.fxml"));
+        primaryStage.setTitle("Video Manager");
+        primaryStage.setResizable(false);
+        primaryStage.setScene(new Scene(root, 1288, 926));
         primaryStage.show();
     }
 
