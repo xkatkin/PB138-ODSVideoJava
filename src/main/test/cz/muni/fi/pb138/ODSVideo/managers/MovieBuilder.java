@@ -42,7 +42,7 @@ public class MovieBuilder {
         return this;
     }
 
-    public Movie Build() {
+    public Movie build() {
         Movie movie = new Movie();
         movie.setName(name);
         movie.setLength(length);
