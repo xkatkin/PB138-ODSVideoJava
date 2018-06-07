@@ -37,7 +37,7 @@ public class IOUtilityImpl implements IOUtility{
         try {
             document = SpreadsheetDocument.loadDocument(file);
         } catch (Exception e) {
-            throw new IOException("failed to open document",e);
+            throw new IOException("failed to open document or the file is not ods format",e);
         }
         return document;
     }
@@ -85,6 +85,9 @@ public class IOUtilityImpl implements IOUtility{
 
     @Override
     public SpreadsheetDocument transformToDocument(Map<String, Category> categoryMap) {
+        if (categoryMap == null) {
+            throw new IllegalArgumentException("categoryMap is null");
+        }
         SpreadsheetDocument document = null;
         try {
             document = SpreadsheetDocument.newSpreadsheetDocument();
@@ -92,9 +95,8 @@ public class IOUtilityImpl implements IOUtility{
             //shouldn't happen
             e.printStackTrace();
         }
-        // TODO: 09/05/2018 shouldn't happen, ill think of something
         if (document == null) {
-            throw new IllegalArgumentException("dunno");
+            throw new IllegalArgumentException("document not loaded");
         }
 
         document.removeSheet(0);
@@ -139,7 +141,7 @@ public class IOUtilityImpl implements IOUtility{
         try {
             length = row.getCellByIndex(1).getDoubleValue().intValue();
         } catch (IllegalArgumentException e){
-            throw new IllegalArgumentException("invalid length");
+            throw new IllegalArgumentException("invalid length",e);
         }
         Set<String> actors= new HashSet<>(new ArrayList<>(
                 Arrays.asList(
@@ -150,7 +152,7 @@ public class IOUtilityImpl implements IOUtility{
         try {
             releaseYear = Year.of(row.getCellByIndex(4).getDoubleValue().intValue());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("invalid year");
+            throw new IllegalArgumentException("invalid year",e);
         }
         return movieQOLConstructor(name,length,actors,status,releaseYear);
     }
