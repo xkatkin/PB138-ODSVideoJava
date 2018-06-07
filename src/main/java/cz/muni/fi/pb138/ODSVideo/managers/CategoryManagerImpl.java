@@ -37,7 +37,7 @@ public class CategoryManagerImpl implements CategoryManager {
     }
 
     @Override
-    public void deleteCategory(String name) {
+    public void deleteCategory(String name) throws IllegalArgumentException{
         if (name == null) {
             throw new IllegalArgumentException("null input argument is not allowed");
         }
