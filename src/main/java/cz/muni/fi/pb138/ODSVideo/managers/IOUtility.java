@@ -5,7 +5,8 @@ import org.odftoolkit.simple.SpreadsheetDocument;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -45,19 +46,19 @@ public interface IOUtility {
     void writeFile(File file, SpreadsheetDocument document) throws IOException;
 
     /**
-     * Transforms .ods document into map of categories and its names as key
+     * Transforms .ods document into list of categories
      * @param document document to transformed
      * @throws IllegalArgumentException if document is null or document parsing failed
      * @return map of categories containing data from document
      */
-    Map<String,Category> transformToMap(SpreadsheetDocument document);
+    Set<Category> transformToList(SpreadsheetDocument document);
 
     /**
-     * Transforms map of categories to SpreadsheetDocument format
-     * @param categoryMap map to be transformed
+     * Transforms list of categories to SpreadsheetDocument format
+     * @param categoryList to be transformed
      * @throws IllegalArgumentException if map is null
      * @return SpreadsheetDocument containing data from map
      */
-    SpreadsheetDocument transformToDocument(Map<String,Category> categoryMap);
+    SpreadsheetDocument transformToDocument(List<Category> categoryList);
 
 }

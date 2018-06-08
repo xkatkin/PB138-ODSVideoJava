@@ -1,18 +1,17 @@
 package cz.muni.fi.pb138.ODSVideo.managers;
 
+import cz.muni.fi.pb138.ODSVideo.exceptions.IllegalEntityException;
+import cz.muni.fi.pb138.ODSVideo.exceptions.ValidationException;
 import cz.muni.fi.pb138.ODSVideo.models.Category;
 import cz.muni.fi.pb138.ODSVideo.models.Movie;
-import cz.muni.fi.pb138.ODSVideo.exceptions.ValidationException;
-import cz.muni.fi.pb138.ODSVideo.exceptions.IllegalEntityException;
 
-import java.util.Collection;
+import java.util.Set;
 
 
 public interface CategoryManager {
     /**
-     * Adds category in parameter to Map<String,Category>
+     * Adds category in parameter to set of categories
      * @throws IllegalArgumentException when category is null
-     * @throws IllegalEntityException when category is already in Map
      * @throws ValidationException when any of the category's attributes are null
      * @param category category to be added
      */
@@ -20,27 +19,17 @@ public interface CategoryManager {
 
     /**
      * Deletes category from map, if category doesn't exist, nothing happens
-     * @throws IllegalArgumentException when name is null
-     * @param name name of category
-     */
-    void deleteCategory(String name);
-
-    /**
-     * updates existing category
      * @throws IllegalArgumentException when category is null
-     * @throws IllegalEntityException when category is not present map
-     * @throws ValidationException when category has null attributes
-     * @param category category to be updated
      */
-    void updateCategory(Category category) throws IllegalEntityException, ValidationException;
+    void deleteCategory(Category category);
 
     /**
-     * tries to find category in map
-     * @throws IllegalArgumentException when name is null
-     * @param name name of category
-     * @return Category present in map or null if operation fails
-     */
-    Category findCategory(String name);
+     * Finds category
+     *
+     * @throws IllegalArgumentException if category does not exist in database
+     * */
+    Category findCategory(Category category);
+
 
     /**
      * moves movie from one category to the other
@@ -50,17 +39,17 @@ public interface CategoryManager {
      * @param into category into which the movie is inserted
      * @param movie movie to be moved
      */
-    void moveMovie(String from, String into, Movie movie) throws IllegalEntityException;
+    void moveMovie(Category from, Category into, Movie movie) throws IllegalEntityException;
 
     /**
-     * returns all categories in map
-     * @return immutable collection of categories in map
+     * returns all categories
+     * @return collection of categories
      */
-    Collection<Category> findAllCategories();
+    Set<Category> getCategories();
 
     /**
      * returns all movies in all categories
-     * @return immutable collection of movies in all categories
+     * @return collection of movies in all categories
      */
-    Collection<Movie> findAllMovies();
+    Set<Movie> findAllMovies();
 }

@@ -1,119 +1,99 @@
 package cz.muni.fi.pb138.ODSVideo.managers;
 
-import cz.muni.fi.pb138.ODSVideo.exceptions.IllegalEntityException;
 import cz.muni.fi.pb138.ODSVideo.exceptions.ValidationException;
 import cz.muni.fi.pb138.ODSVideo.models.Category;
 import cz.muni.fi.pb138.ODSVideo.models.Movie;
 import cz.muni.fi.pb138.ODSVideo.models.Status;
 
 import java.time.Year;
-import java.util.*;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-public class MovieManagerImpl implements MovieManager{
+public class MovieManagerImpl implements MovieManager {
+
     @Override
     public void createMovie(Category category, Movie movie) throws ValidationException {
-        if (category == null || movie == null) {
-            throw new IllegalArgumentException("input arguments cannot be null");
-        }
+        Objects.requireNonNull(category);
+        Objects.requireNonNull(movie);
+
         if (!isValid(movie)) {
-            throw new ValidationException("movie not valid");
+            throw new ValidationException("Movie is not valid");
         }
-        if (movie.getStatus() == null) {
-            movie.setStatus(Status.AVAILABLE);
-        }
-        Set<Movie> movieSet = category.getMovies();
-        if(movieSet.contains(movie)) {
-            movieSet.remove(movie);
-        }
-        movieSet.add(movie);
+
+        category.getMovies().add(movie);
     }
 
     @Override
-    public void deleteMovie(Category category, String name) {
-        if (category == null || name == null) {
-            throw new IllegalArgumentException("input arguments cannot be null");
-        }
+    public void deleteMovie(Category category, Movie movie) {
+        Objects.requireNonNull(category);
+        Objects.requireNonNull(movie);
 
-        category.getMovies().remove(findMovie(category,name));
+        category.getMovies().remove(movie);
     }
 
     @Override
-    public void updateMovie(Category category, Movie movie) throws ValidationException, IllegalEntityException {
-        if (category == null || movie == null) {
-            throw new IllegalArgumentException("input arguments cannot be null");
-        }
-        if (!isValid(movie) || movie.getStatus() == null) {
-            throw new ValidationException("movie not valid");
-        }
-        if(!category.getMovies().contains(movie)) {
-            throw new IllegalEntityException("movie not in category");
-        }
-        Set<Movie> movieSet = category.getMovies();
-        movieSet.remove(movie);
-        movieSet.add(movie);
+    public void updateMovie(Category category, Movie movie) {
+        Objects.requireNonNull(category);
+        Objects.requireNonNull(movie);
+
+        category.getMovies().remove(movie);
+        category.getMovies().add(movie);
 
     }
 
     @Override
-    public Movie findMovie(Category category, String name) {
-        for(Movie movie : category.getMovies()) {
-            if(movie.getName().equals(name)) {
-                return movie;
-            }
-        }
-        return null;
+    public Movie findByName(Category category, String name) {
+        return category.getMovies()
+                .stream()
+                .filter(movie -> movie.getName().equalsIgnoreCase(name))
+                .findAny()
+                .orElse(null);
     }
 
     @Override
-    public Collection<Movie> findByLength(Category category, int length) {
-        List<Movie> byLength = new ArrayList<>();
-        for(Movie movie : category.getMovies()) {
-            if(movie.getLength() == length) {
-                byLength.add(movie);
-            }
-        }
-        return Collections.unmodifiableCollection(byLength);
+    public Set<Movie> findByLength(Category category, int length) {
+        return Collections.unmodifiableSet(
+                category.getMovies()
+                        .stream()
+                        .filter(movie -> movie.getLength() == length)
+                        .collect(Collectors.toSet()));
     }
 
     @Override
-    public Collection<Movie> findByActor(Category category, String actor) {
-        List<Movie> byActor = new ArrayList<>();
-        for(Movie movie : category.getMovies()) {
-            if(movie.getActors().contains(actor)) {
-                byActor.add(movie);
-            }
-        }
-        return Collections.unmodifiableCollection(byActor);
+    public Set<Movie> findByActor(Category category, String actor) {
+        return Collections.unmodifiableSet(
+                category.getMovies()
+                        .stream()
+                        .filter(movie -> movie.getActors().contains(actor))
+                        .collect(Collectors.toSet()));
     }
 
     @Override
-    public Collection<Movie> findByYear(Category category, Year year) {
-        List<Movie> byYear = new ArrayList<>();
-        for(Movie movie : category.getMovies()) {
-            if(movie.getReleaseYear() == year) {
-                byYear.add(movie);
-            }
-        }
-        return Collections.unmodifiableCollection(byYear);
+    public Set<Movie> findByYear(Category category, Year year) {
+        return Collections.unmodifiableSet(
+                category.getMovies()
+                        .stream()
+                        .filter(movie -> movie.getReleaseYear().equals(year))
+                        .collect(Collectors.toSet()));
     }
 
     @Override
-    public Collection<Movie> findByStatus(Category category, Status status) {
-        List<Movie> byStatus = new ArrayList<>();
-        for(Movie movie : category.getMovies()) {
-            if(movie.getStatus().equals(status)) {
-                byStatus.add(movie);
-            }
-        }
-        return Collections.unmodifiableCollection(byStatus);
+    public Set<Movie> findByStatus(Category category, Status status) {
+        return Collections.unmodifiableSet(
+                category.getMovies()
+                        .stream()
+                        .filter(movie -> movie.getStatus().equals(status))
+                        .collect(Collectors.toSet()));
     }
 
     @Override
-    public Collection<Movie> findAllMovies(Category category) {
-        return Collections.unmodifiableCollection(category.getMovies());
+    public Set<Movie> findAllMovies(Category category) {
+        return Collections.unmodifiableSet(category.getMovies());
     }
 
-    private boolean isValid(Movie movie) {
+    private static boolean isValid(Movie movie) {
         return movie.getActors() != null && movie.getLength() >= 0 && movie.getName() != null
                 && movie.getReleaseYear() != null;
     }

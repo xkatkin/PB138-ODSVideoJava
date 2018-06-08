@@ -1,117 +1,83 @@
 package cz.muni.fi.pb138.ODSVideo.managers;
 
-import cz.muni.fi.pb138.ODSVideo.exceptions.IllegalEntityException;
 import cz.muni.fi.pb138.ODSVideo.exceptions.ValidationException;
 import cz.muni.fi.pb138.ODSVideo.models.Category;
 import cz.muni.fi.pb138.ODSVideo.models.Movie;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CategoryManagerImpl implements CategoryManager {
 
-    private Map<String,Category> categories;
+    private Set<Category> categories;
 
-    public CategoryManagerImpl(Map<String, Category> categories) {
-        if (categories == null) {
-            throw new IllegalArgumentException("null input argument is not allowed");
-        }
+    public CategoryManagerImpl(Set<Category> categories) {
+        Objects.requireNonNull(categories, "Categories cannot be null");
+
         this.categories = categories;
     }
 
     @Override
-    public void createCategory(Category category) throws ValidationException, IllegalEntityException {
-        if (category == null) {
-            throw new IllegalArgumentException("null input argument is not allowed");
-        }
+    public void createCategory(Category category) throws ValidationException {
+        Objects.requireNonNull(category, "Category cannot be null");
+
         if (!isValid(category)) {
-            throw new ValidationException("category is invalid");
-        }
-        if (categories.containsKey(category.getName())) {
-            throw new IllegalEntityException("category is already exists in map");
+            throw new ValidationException("Category is invalid");
         }
 
-        categories.put(category.getName(),category);
+        if (categories.contains(category)) {
+            throw new IllegalArgumentException("Category already exists in map");
+        }
+
+        categories.add(category);
     }
 
     @Override
-    public void deleteCategory(String name) throws IllegalArgumentException{
-        if (name == null) {
-            throw new IllegalArgumentException("null input argument is not allowed");
-        }
+    public void deleteCategory(Category category) {
+        Objects.requireNonNull(category, "Category cannot be null");
 
-        categories.remove(name);
+        categories.remove(category);
     }
 
     @Override
-    public void updateCategory(Category category) throws IllegalEntityException, ValidationException {
-        if (category == null) {
-            throw new IllegalArgumentException("null input argument is not allowed");
-        }
-        if (!isValid(category)) {
-            throw new ValidationException("category is invalid");
-        }
-        if (!categories.containsKey(category.getName())) {
-            throw new IllegalEntityException("category doesn't exist in map");
-        }
+    public Category findCategory(Category category) {
+        Objects.requireNonNull(category, "Category cannot be null");
 
-        categories.replace(category.getName(),category);
+        return categories.stream()
+                .filter(c -> c.equals(category))
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("Category does not exists."));
     }
 
     @Override
-    public Category findCategory(String name) {
-        if (name == null) {
-            throw new IllegalArgumentException("null input argument is not allowed");
-        }
+    public void moveMovie(Category from, Category into, Movie movie) {
+        Objects.requireNonNull(from);
+        Objects.requireNonNull(into);
+        Objects.requireNonNull(movie);
 
-        return categories.get(name);
-    }
-
-    @Override
-    public void moveMovie(String from, String into, Movie movie) throws IllegalEntityException {
-        if (from == null || into == null || movie == null) {
-            throw new IllegalArgumentException("null input argument is not allowed");
-        }
-        Category fromC = findCategory(from);
-        Category intoC = findCategory(into);
-        if (fromC == null || intoC == null || !(fromC.getMovies().contains(movie))) {
-            //TODO write message
-            throw new IllegalEntityException("idk");
-        }
-
-        try {
-            MovieManager movieManager = new MovieManagerImpl();
-            movieManager.deleteMovie(findCategory(from),movie.getName());
-            movieManager.createMovie(findCategory(into),movie);
-        } catch (ValidationException e) {
-            //never happens tho
-            e.printStackTrace();
-        }
-
+        from.getMovies().remove(movie);
+        into.getMovies().add(movie);
 
     }
 
     @Override
-    public Collection<Category> findAllCategories() {
-        return Collections.unmodifiableCollection(categories.values());
+    public Set<Category> getCategories() {
+        return categories;
     }
 
     @Override
-    public Collection<Movie> findAllMovies() {
-        return Collections.unmodifiableCollection(
-                categories
-                .values()
+    public Set<Movie> findAllMovies() {
+        return categories
                 .stream()
-                .map(category -> new MovieManagerImpl().findAllMovies(category))
+                .map(Category::getMovies)
                 .flatMap(Collection::stream)
-                .collect(Collectors.toSet())
-                );
+                .collect(Collectors.toSet());
 
     }
 
-    private boolean isValid(Category category) {
+    private static boolean isValid(Category category) {
         return category.getName() != null && category.getMovies() != null;
     }
 }

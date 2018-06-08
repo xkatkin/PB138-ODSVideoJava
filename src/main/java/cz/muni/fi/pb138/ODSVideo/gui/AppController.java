@@ -17,6 +17,9 @@ import org.odftoolkit.simple.SpreadsheetDocument;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Year;
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class AppController {
 
@@ -111,12 +114,12 @@ public class AppController {
 
     private void initDatabase(File databaseFile) throws IOException {
         database = ioManager.readFile(databaseFile);
-        categoryManager = new CategoryManagerImpl(ioManager.transformToMap(database));
+        categoryManager = new CategoryManagerImpl(ioManager.transformToList(database));
         movieManager = new MovieManagerImpl();
 
         globalCategorySelector.setDisable(false);
-        globalCategorySelector.setItems(FXCollections.observableArrayList(categoryManager.findAllCategories()));
-        localCategorySelector.setItems(FXCollections.observableArrayList(categoryManager.findAllCategories()));
+        globalCategorySelector.setItems(FXCollections.observableArrayList(categoryManager.getCategories()));
+        localCategorySelector.setItems(FXCollections.observableArrayList(categoryManager.getCategories()));
     }
 
     @FXML
@@ -138,5 +141,15 @@ public class AppController {
         movieActors.setText(String.join(", ", selectedMovie.getActors()));
         movieRelease.setText(String.valueOf(selectedMovie.getReleaseYear()));
         movieStatus.getSelectionModel().select(selectedMovie.getStatus());
+    }
+
+    @FXML
+    private void saveMovie() {
+        selectedMovie.setName(movieName.getText());
+        selectedMovie.setLength(Integer.parseInt(movieLength.getText())); // TODO validate
+        selectedMovie.setActors(new HashSet<>(Arrays.asList(movieActors.getText().split(", "))));
+        selectedMovie.setReleaseYear(Year.parse(movieRelease.getText()));
+        selectedMovie.setStatus(movieStatus.getValue());
+
     }
 }

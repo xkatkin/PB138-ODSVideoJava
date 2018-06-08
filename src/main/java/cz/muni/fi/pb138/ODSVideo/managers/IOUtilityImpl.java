@@ -10,154 +10,90 @@ import org.odftoolkit.simple.table.Table;
 import java.io.File;
 import java.io.IOException;
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class IOUtilityImpl implements IOUtility{
+public class IOUtilityImpl implements IOUtility {
+
     @Override
     public SpreadsheetDocument readFile(String path) throws IOException {
-        if (path == null) {
-            throw new IllegalArgumentException("arguments cannot be null");
-        }
+        Objects.requireNonNull(path);
+
         return readFile(new File(path));
     }
 
     @Override
     public SpreadsheetDocument readFile(File file) throws IOException {
-        if (file == null) {
-            throw new IllegalArgumentException("arguments cannot be null");
-        }
+        Objects.requireNonNull(file);
 
         SpreadsheetDocument document;
         try {
             document = SpreadsheetDocument.loadDocument(file);
         } catch (Exception e) {
-            throw new IOException("failed to open document or the file is not ods format",e);
+            throw new IOException("Failed to open document or the file is not in .ods format", e);
         }
         return document;
     }
 
     @Override
-    public void writeFile(String path, SpreadsheetDocument document) throws IOException{
-        if (path == null || document == null) {
-            throw new IllegalArgumentException("arguments cannot be null");
-        }
+    public void writeFile(String path, SpreadsheetDocument document) throws IOException {
+        Objects.requireNonNull(path);
+        Objects.requireNonNull(document);
+
         writeFile(new File(path), document);
     }
 
     @Override
-    public void writeFile(File file, SpreadsheetDocument document) throws IOException{
-        if (file == null || document == null) {
-            throw new IllegalArgumentException("arguments cannot be null");
-        }
+    public void writeFile(File file, SpreadsheetDocument document) throws IOException {
+        Objects.requireNonNull(file);
+        Objects.requireNonNull(document);
 
         try {
             document.save(file);
         } catch (Exception e) {
-            throw new IOException("failed to write", e);
+            throw new IOException("Failed to write to document", e);
         }
     }
 
     @Override
-    public Map<String, Category> transformToMap(SpreadsheetDocument document) {
-        if (document == null) {
-            throw new IllegalArgumentException("argument cannot be null");
-        }
-        Map<String, Category> map = new HashMap<>();
-        for (Table table : document.getTableList()) {
-            Category category = new Category();
-            category.setName(table.getTableName());
-            Set<Movie> movies = new HashSet<>();
-            List<Row> rowList = ignoreFirstRow(table.getRowList());
-            for (Row row : rowList) {
-                movies.add(parseRow(row));
-            }
-            category.setMovies(movies);
-            map.put(category.getName(),category);
-        }
-        return map;
-    }
+    public Set<Category> transformToList(SpreadsheetDocument document) {
+        Objects.requireNonNull(document);
 
-    @Override
-    public SpreadsheetDocument transformToDocument(Map<String, Category> categoryMap) {
-        if (categoryMap == null) {
-            throw new IllegalArgumentException("categoryMap is null");
-        }
-        SpreadsheetDocument document = null;
-        try {
-            document = SpreadsheetDocument.newSpreadsheetDocument();
-        } catch (Exception e) {
-            //shouldn't happen
-            e.printStackTrace();
-        }
-        if (document == null) {
-            throw new IllegalArgumentException("document not loaded");
-        }
+        Set<Category> categories = new HashSet<>();
+        document.getTableList()
+                .forEach(table -> {
+                    Category category = new Category();
+                    category.setName(table.getTableName());
+                    category.setMovies(table
+                            .getRowList()
+                            .stream()
+                            .skip(1)
+                            .map(IOUtilityImpl::parseRow)
+                            .collect(Collectors.toSet())
+                    );
+                    categories.add(category);
+                });
 
-        document.removeSheet(0);
-        for (Map.Entry<String, Category> entry : categoryMap.entrySet()) {
-            Table table = document.appendSheet(entry.getKey());
-            table.removeRowsByIndex(0,2);
-            int tableCount = table.getRowCount();
-            writeFirstRow(table.appendRow());
-            Set<Movie> movies = entry.getValue().getMovies();
-            for (Movie movie:movies) {
-                parseMovie(table.appendRow(),movie);
-            }
-        }
-        return document;
-    }
-
-    private static List<Row> ignoreFirstRow(List<Row> list) {
-        if (list == null || list.size() == 0) {
-            return list;
-        }
-        list.remove(0);
-        return list;
-    }
-
-    private static Status parseStatus(String input) {
-        input = input.toUpperCase();
-        switch (input) {
-            case "AVAILABLE":
-                return Status.AVAILABLE;
-            case "RENTED":
-                return Status.RENTED;
-            case "LOST":
-                return Status.LOST;
-            default:
-                throw new IllegalArgumentException("status cannot be parsed");
-        }
+        return categories;
     }
 
     private static Movie parseRow(Row row) {
         String name = row.getCellByIndex(0).getDisplayText();
-        int length;
-        try {
-            length = row.getCellByIndex(1).getDoubleValue().intValue();
-        } catch (IllegalArgumentException e){
-            throw new IllegalArgumentException("invalid length",e);
-        }
-        Set<String> actors= new HashSet<>(new ArrayList<>(
-                Arrays.asList(
-                        row.getCellByIndex(2).getDisplayText().split(";")
-                )));
+
+        int length = row.getCellByIndex(1).getDoubleValue().intValue();
+
+        Set<String> actors = new HashSet<>(Arrays.asList(row.getCellByIndex(2).getDisplayText().split(";")));
         Status status = parseStatus(row.getCellByIndex(3).getDisplayText());
-        Year releaseYear;
-        try {
-            releaseYear = Year.of(row.getCellByIndex(4).getDoubleValue().intValue());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("invalid year",e);
-        }
-        return movieQOLConstructor(name,length,actors,status,releaseYear);
+        Year releaseYear = Year.of(row.getCellByIndex(4).getDoubleValue().intValue());
+
+        return movieConstructor(name, length, actors, status, releaseYear);
     }
 
-    private static Movie movieQOLConstructor(String name, int length, Set<String> actors, Status status, Year releaseYear) {
+    private static Status parseStatus(String input) {
+        return Status.valueOf(input.trim().toUpperCase());
+    }
+
+    private static Movie movieConstructor(String name, int length, Set<String> actors, Status status, Year releaseYear) {
         Movie movie = new Movie();
         movie.setName(name);
         movie.setStatus(status);
@@ -165,6 +101,28 @@ public class IOUtilityImpl implements IOUtility{
         movie.setActors(actors);
         movie.setReleaseYear(releaseYear);
         return movie;
+    }
+
+    @Override
+    public SpreadsheetDocument transformToDocument(List<Category> categoryList) {
+        Objects.requireNonNull(categoryList);
+
+        SpreadsheetDocument document = null;
+        try {
+            document = SpreadsheetDocument.newSpreadsheetDocument();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        document.removeSheet(0);
+        for (Category category : categoryList) {
+            Table table = document.appendSheet(category.getName());
+            table.removeRowsByIndex(0, 2);
+            writeFirstRow(table.appendRow());
+            category.getMovies().forEach(movie -> parseMovie(table.appendRow(), movie));
+        }
+
+        return document;
     }
 
     private static void writeFirstRow(Row row) {
@@ -179,7 +137,7 @@ public class IOUtilityImpl implements IOUtility{
         row.getCellByIndex(0).setDisplayText(movie.getName());
         row.getCellByIndex(1).setFormatString("0");
         row.getCellByIndex(1).setDisplayText(Integer.toString(movie.getLength()));
-        row.getCellByIndex(2).setDisplayText(String.join(";",movie.getActors()));
+        row.getCellByIndex(2).setDisplayText(String.join(";", movie.getActors()));
         row.getCellByIndex(3).setDisplayText(movie.getStatus().toString());
         row.getCellByIndex(4).setFormatString("0");
         row.getCellByIndex(4).setDisplayText(Integer.toString(movie.getReleaseYear().getValue()));
