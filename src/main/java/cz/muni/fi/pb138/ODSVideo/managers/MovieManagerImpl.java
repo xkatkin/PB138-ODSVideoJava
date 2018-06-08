@@ -40,17 +40,6 @@ public class MovieManagerImpl implements MovieManager {
     }
 
     @Override
-    public void updateMovie(Category category, Movie movie) {
-        if (category == null || movie == null) {
-            throw new IllegalArgumentException("parameter cannot be null");
-        }
-
-        category.getMovies().remove(movie);
-        category.getMovies().add(movie);
-
-    }
-
-    @Override
     public Movie findByName(Category category, String name) {
         if (category == null || name == null) {
             throw new IllegalArgumentException("parameter cannot be null");

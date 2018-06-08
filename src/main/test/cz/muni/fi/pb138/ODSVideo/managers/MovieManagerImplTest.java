@@ -154,56 +154,6 @@ class MovieManagerImplTest {
     }
 
     @Test
-    void updateMovieNullArgument() throws Exception {
-        Movie movie = testMovie2Builder().build();
-        Category category = testCategory().build();
-
-        manager.createMovie(category, movie);
-        Assertions.assertThrows(IllegalArgumentException.class,()-> {
-            manager.updateMovie(category, null);
-        });
-
-    }
-
-    @Test
-    void updateMovieNullStatus() throws Exception {
-        Movie movie = testMovie2Builder().build();
-        Category category = testCategory().build();
-
-        manager.createMovie(category, movie);
-        movie.setStatus(null);
-
-        Assertions.assertThrows(ValidationException.class,()-> {
-            manager.updateMovie(category, movie);
-        });
-    }
-
-    @Test
-    void updateNonExistentMovie() throws Exception {
-        Movie movie1 = testMovie1Builder().build();
-        Movie movie2 = testMovie2Builder().build();
-        Category category = testCategory().build();
-
-        manager.createMovie(category, movie1);
-        Assertions.assertThrows(IllegalEntityException.class,()-> {
-            manager.updateMovie(category, movie2);
-        });
-
-    }
-
-    @Test
-    void updateMovie() throws Exception {
-        Movie movie = testMovie2Builder().build();
-        Category category = testCategory().build();
-
-        manager.createMovie(category, movie);
-        movie.setLength(150);
-        manager.updateMovie(category, movie);
-        Movie movie1 = manager.findByName(category, movie.getName());
-        assertTrue(movie1.getLength() == 150);
-    }
-
-    @Test
     void findMovieNonexistent() {
         Category category = testCategory().build();
         assertTrue(manager.findByName(category, "Sharks") == null);

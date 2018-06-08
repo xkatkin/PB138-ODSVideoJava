@@ -32,16 +32,6 @@ public interface MovieManager {
     void deleteMovie(Category category, Movie movie);
 
     /**
-     * updates movie in category
-     * @param category to be updated in
-     * @param movie to be updated
-     * @throws IllegalArgumentException if any of the arguments are null
-     * @throws ValidationException if any of movie's parameters are null or incorrect
-     * @throws IllegalEntityException if movie is not present in category
-     */
-    void updateMovie(Category category, Movie movie) throws ValidationException, IllegalEntityException;
-
-    /**
      * finds movie by name
      * @param category to look for movie in
      * @param name of the movie
