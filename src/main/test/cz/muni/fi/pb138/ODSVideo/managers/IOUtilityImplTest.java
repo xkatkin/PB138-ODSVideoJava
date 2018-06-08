@@ -1,13 +1,7 @@
 package cz.muni.fi.pb138.ODSVideo.managers;
 
-import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.assertj.core.api.Assertions.*;
-
 class IOUtilityImplTest {
+    /*
     private IOUtility io = new IOUtilityImpl();
 
     @Test
@@ -69,4 +63,5 @@ class IOUtilityImplTest {
         assertThatThrownBy(() -> io.writeFile(nullStr,null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+    */
 }

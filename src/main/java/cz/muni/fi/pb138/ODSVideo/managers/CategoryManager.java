@@ -28,7 +28,7 @@ public interface CategoryManager {
      *
      * @throws IllegalArgumentException if category does not exist in database
      * */
-    Category findCategory(Category category);
+    Category findCategory(String name);
 
 
     /**
@@ -39,13 +39,15 @@ public interface CategoryManager {
      * @param into category into which the movie is inserted
      * @param movie movie to be moved
      */
-    void moveMovie(Category from, Category into, Movie movie) throws IllegalEntityException;
+    void moveMovie(Category from, Category into, Movie movie);
 
     /**
      * returns all categories
      * @return collection of categories
      */
     Set<Category> getCategories();
+
+    void setCategories(Set<Category> categories);
 
     /**
      * returns all movies in all categories

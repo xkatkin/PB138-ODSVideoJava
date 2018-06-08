@@ -1,7 +1,5 @@
 package cz.muni.fi.pb138.ODSVideo.managers;
 
-import com.sun.xml.internal.fastinfoset.algorithm.IEEE754FloatingPointEncodingAlgorithm;
-import cz.muni.fi.pb138.ODSVideo.exceptions.IllegalEntityException;
 import cz.muni.fi.pb138.ODSVideo.exceptions.ValidationException;
 import cz.muni.fi.pb138.ODSVideo.models.Category;
 import cz.muni.fi.pb138.ODSVideo.models.Movie;
@@ -10,9 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.Year;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -65,7 +61,7 @@ class CategoryManagerImplTest {
     }
 
     @Test
-    void createCategoryWithNullMovies() throws Exception{
+    void createCategoryWithNullMovies() {
         Category category = testCategory1Builder()
                 .movies(null)
                 .build();
@@ -75,7 +71,7 @@ class CategoryManagerImplTest {
     }
 
     @Test
-    void createCategoryWithNullName() throws Exception{
+    void createCategoryWithNullName() {
         Category category = testCategory1Builder()
                 .name(null)
                 .build();
@@ -85,7 +81,7 @@ class CategoryManagerImplTest {
     }
 
     @Test
-    void deleteCategoryWithNullName() throws Exception{
+    void deleteCategoryWithNullName() {
         Assertions.assertThrows(IllegalArgumentException.class,()-> {
             manager.deleteCategory(null);
         });
@@ -145,7 +141,7 @@ class CategoryManagerImplTest {
                 .name(null)
                 .build();
         Assertions.assertThrows(IllegalArgumentException.class,()-> {
-            manager.findCategory(category);
+            manager.findCategory(category.getName());
         });
     }
 
@@ -153,7 +149,7 @@ class CategoryManagerImplTest {
     void findCategory() throws Exception{
         Category category = testCategory1Builder().build();
         manager.createCategory(category);
-        Assertions.assertTrue(manager.findCategory(category).equals(category));
+        Assertions.assertTrue(manager.findCategory(category.getName()).equals(category));
     }
 
     @Test

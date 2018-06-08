@@ -1,18 +1,20 @@
 package cz.muni.fi.pb138.ODSVideo.gui;
 
+import cz.muni.fi.pb138.ODSVideo.exceptions.ValidationException;
 import cz.muni.fi.pb138.ODSVideo.managers.*;
 import cz.muni.fi.pb138.ODSVideo.models.Category;
 import cz.muni.fi.pb138.ODSVideo.models.Movie;
 import cz.muni.fi.pb138.ODSVideo.models.Status;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.util.Callback;
 import org.odftoolkit.simple.SpreadsheetDocument;
 
 import java.io.File;
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.time.Year;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 public class AppController {
 
@@ -27,13 +30,13 @@ public class AppController {
     private VBox main;
 
     @FXML
-    private ComboBox<Category> globalCategorySelector;
+    private ComboBox<String> globalCategorySelector;
 
     @FXML
-    private ComboBox<Category> localCategorySelector;
+    private ComboBox<String> localCategorySelector;
 
     @FXML
-    private ListView<Movie> movieSelector;
+    private ListView<String> movieSelector;
 
     @FXML
     private TextField movieName;
@@ -65,36 +68,12 @@ public class AppController {
     private void initialize() {
         ioManager = new IOUtilityImpl();
 
-        Callback<ListView<Category>, ListCell<Category>> categoryFactory = lv -> new ListCell<Category>() {
-            @Override
-            protected void updateItem(Category item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty ? "Unnamed category" : item.getName());
-            }
-        };
-
-        globalCategorySelector.setCellFactory(categoryFactory);
-        globalCategorySelector.setButtonCell(categoryFactory.call(null));
-        localCategorySelector.setCellFactory(categoryFactory);
-        localCategorySelector.setButtonCell(categoryFactory.call(null));
-
-        Callback<ListView<Movie>, ListCell<Movie>> movieFactory = lv -> new ListCell<Movie>() {
-            @Override
-            protected void updateItem(Movie item, boolean empty) {
-                super.updateItem(item, empty);
-                if (!empty) {
-                    setText(item.getName());
-                }
-            }
-        };
-        movieSelector.setCellFactory(movieFactory);
-        movieSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                selectMovie(newValue);
-            }
-        });
 
         movieStatus.setItems(FXCollections.observableArrayList(Status.values()));
+
+        makeTextFieldNumeric(movieLength);
+        makeTextFieldNumeric(movieRelease);
+
     }
 
     @FXML
@@ -118,38 +97,160 @@ public class AppController {
         movieManager = new MovieManagerImpl();
 
         globalCategorySelector.setDisable(false);
-        globalCategorySelector.setItems(FXCollections.observableArrayList(categoryManager.getCategories()));
-        localCategorySelector.setItems(FXCollections.observableArrayList(categoryManager.getCategories()));
+
+        updateCategoriesList();
+
+        movieSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selectMovie(newValue));
+
+        globalCategorySelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selectCategory(newValue));
+    }
+
+    private void selectCategory(String name) {
+        if (name == null) return;
+        selectedCategory = categoryManager.findCategory(name);
+
+        updateMoviesList();
+    }
+
+    private void selectMovie(String name) {
+        if (name == null) return;
+        selectedMovie = movieManager.findByName(selectedCategory, name);
+
+        if (selectedMovie != null) {
+            localCategorySelector.setDisable(false);
+            movieStatus.setDisable(false);
+            localCategorySelector.getSelectionModel().select(selectedCategory.getName());
+
+            movieName.setText(selectedMovie.getName());
+            movieLength.setText(String.valueOf(selectedMovie.getLength()));
+            movieActors.setText(String.join(", ", selectedMovie.getActors()));
+            movieRelease.setText(String.valueOf(selectedMovie.getReleaseYear()));
+            movieStatus.getSelectionModel().select(selectedMovie.getStatus());
+        }
     }
 
     @FXML
-    private void selectCategory() {
-        selectedCategory = globalCategorySelector.getValue();
-        if (selectedCategory != null)
-            movieSelector.setItems(FXCollections.observableArrayList(selectedCategory.getMovies()));
-    }
+    private void saveMovie() throws ValidationException {
+        movieManager.deleteMovie(selectedCategory, selectedMovie);
 
-    @FXML
-    private void selectMovie(Movie movie) {
-        selectedMovie = movie;
-        localCategorySelector.setDisable(false);
-        movieStatus.setDisable(false);
-        localCategorySelector.getSelectionModel().select(selectedCategory);
-
-        movieName.setText(selectedMovie.getName());
-        movieLength.setText(String.valueOf(selectedMovie.getLength()));
-        movieActors.setText(String.join(", ", selectedMovie.getActors()));
-        movieRelease.setText(String.valueOf(selectedMovie.getReleaseYear()));
-        movieStatus.getSelectionModel().select(selectedMovie.getStatus());
-    }
-
-    @FXML
-    private void saveMovie() {
         selectedMovie.setName(movieName.getText());
         selectedMovie.setLength(Integer.parseInt(movieLength.getText())); // TODO validate
         selectedMovie.setActors(new HashSet<>(Arrays.asList(movieActors.getText().split(", "))));
         selectedMovie.setReleaseYear(Year.parse(movieRelease.getText()));
         selectedMovie.setStatus(movieStatus.getValue());
 
+        movieManager.createMovie(selectedCategory, selectedMovie);
+        Category newCategory = categoryManager.findCategory(localCategorySelector.getValue());
+        if (!newCategory.equals(selectedCategory)) {
+            categoryManager.moveMovie(selectedCategory, newCategory, selectedMovie);
+            globalCategorySelector.getSelectionModel().select(newCategory.getName());
+        }
+
+        updateMoviesList();
+    }
+
+    private void makeTextFieldNumeric(TextField textField) {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                textField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
+    }
+
+    private void updateCategoriesList() {
+        ObservableList<String> categoriesNames = categoryManager.getCategories().stream()
+                .map(Category::getName)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), FXCollections::observableArrayList));
+
+        globalCategorySelector.setItems(categoriesNames);
+        localCategorySelector.setItems(categoriesNames);
+    }
+
+    private void updateMoviesList() {
+        ObservableList<String> movieNames = selectedCategory.getMovies().stream()
+                .map(Movie::getName)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), FXCollections::observableArrayList));
+        movieSelector.setItems(movieNames);
+    }
+
+    @FXML
+    private void saveFile() throws IOException {
+        SpreadsheetDocument saved = ioManager.transformToDocument(categoryManager.getCategories());
+        ioManager.writeFile(databaseFile, saved);
+        System.out.println("Saved!");
+    }
+
+    @FXML
+    private void deleteMovie() {
+        if (selectedMovie != null) {
+            movieManager.deleteMovie(selectedCategory, selectedMovie);
+            updateMoviesList();
+            movieSelector.getSelectionModel().selectFirst();
+
+        }
+    }
+
+
+    @FXML
+    private void newMovie() {
+        selectedMovie = new Movie();
+
+        localCategorySelector.getSelectionModel().select(selectedCategory.getName());
+        movieName.setText("");
+        movieLength.setText("");
+        movieActors.setText("");
+        movieRelease.setText("");
+        movieStatus.getSelectionModel().select(Status.AVAILABLE);
+    }
+
+    @FXML
+    private void createCategory() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Create new category");
+        dialog.setHeaderText("Create new category");
+        dialog.setContentText("Please enter category name:");
+
+        dialog.showAndWait().ifPresent(name -> {
+            Category category = new Category();
+            category.setMovies(new HashSet<>());
+            category.setName(name);
+            try {
+                categoryManager.createCategory(category);
+            } catch (ValidationException e) {
+                e.printStackTrace();
+            }
+            updateCategoriesList();
+            globalCategorySelector.getSelectionModel().select(category.getName());
+        });
+    }
+
+    @FXML
+    private void renameCategory() {
+        TextInputDialog dialog = new TextInputDialog(selectedCategory.getName());
+        dialog.setTitle("Rename category");
+        dialog.setHeaderText("Rename category");
+        dialog.setContentText("Please enter new category name:");
+
+        dialog.showAndWait().ifPresent(name -> {
+            selectedCategory.setName(name);
+            updateCategoriesList();
+            globalCategorySelector.getSelectionModel().select(name);
+        });
+    }
+
+    @FXML
+    private void deleteCategory() {
+        if (selectedCategory != null) {
+            categoryManager.deleteCategory(selectedCategory);
+            updateCategoriesList();
+            globalCategorySelector.getSelectionModel().selectFirst();
+        }
+
+        // TODO fix exception
+    }
+
+    @FXML
+    private void quitApplication() {
+        Platform.exit();
     }
 }

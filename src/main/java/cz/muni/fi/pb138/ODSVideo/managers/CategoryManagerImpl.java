@@ -1,12 +1,11 @@
 package cz.muni.fi.pb138.ODSVideo.managers;
 
-import cz.muni.fi.pb138.ODSVideo.exceptions.IllegalEntityException;
 import cz.muni.fi.pb138.ODSVideo.exceptions.ValidationException;
 import cz.muni.fi.pb138.ODSVideo.models.Category;
 import cz.muni.fi.pb138.ODSVideo.models.Movie;
 
 import java.util.Collection;
-import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,6 +35,7 @@ public class CategoryManagerImpl implements CategoryManager {
             throw new IllegalArgumentException("Category already exists in map");
         }
 
+        category.setMovies(new HashSet<>());
         categories.add(category);
     }
 
@@ -48,12 +48,13 @@ public class CategoryManagerImpl implements CategoryManager {
     }
 
     @Override
-    public Category findCategory(Category category) {
-        if (category == null) {
+    public Category findCategory(String name) {
+        if (name == null) {
             throw new IllegalArgumentException("Category cannot be null");
         }
+
         return categories.stream()
-                .filter(c -> c.equals(category))
+                .filter(c -> c.getName().equals(name))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("Category does not exists."));
     }
@@ -81,6 +82,10 @@ public class CategoryManagerImpl implements CategoryManager {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
 
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
     }
 
     private static boolean isValid(Category category) {

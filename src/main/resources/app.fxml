@@ -10,13 +10,11 @@
       <menus>
         <Menu mnemonicParsing="false" text="File">
           <items>
-            <MenuItem mnemonicParsing="false" text="New" />
               <MenuItem mnemonicParsing="false" onAction="#selectFile" text="Open…"/>
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Save" />
-            <MenuItem mnemonicParsing="false" text="Save As…" />
+              <MenuItem mnemonicParsing="false" onAction="#saveFile" text="Save"/>
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Quit" />
+              <MenuItem mnemonicParsing="false" onAction="#quitApplication" text="Quit"/>
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
@@ -30,21 +28,21 @@
          <children>
              <VBox alignment="CENTER_LEFT" prefHeight="813.0" prefWidth="437.0" HBox.hgrow="ALWAYS">
                <children>
-                   <ComboBox fx:id="globalCategorySelector" disable="true" onAction="#selectCategory" prefHeight="26.0"
-                             prefWidth="739.0" promptText="Select movie category..."/>
+                   <ComboBox fx:id="globalCategorySelector" disable="true" prefHeight="26.0" prefWidth="739.0"
+                             promptText="Select movie category..."/>
                    <HBox alignment="CENTER_LEFT" prefHeight="112.0" prefWidth="370.0" spacing="10.0"
                          VBox.vgrow="ALWAYS">
                      <children>
-                        <Button mnemonicParsing="false" text="New" />
-                        <Button mnemonicParsing="false" text="Delete" />
-                        <Button mnemonicParsing="false" text="Rename" />
+                         <Button mnemonicParsing="false" onAction="#createCategory" text="New"/>
+                         <Button mnemonicParsing="false" onAction="#deleteCategory" text="Delete"/>
+                         <Button mnemonicParsing="false" onAction="#renameCategory" text="Rename"/>
                      </children>
                   </HBox>
                    <ListView fx:id="movieSelector" prefHeight="653.0" prefWidth="384.0"/>
                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                        <Button mnemonicParsing="false" text="New" />
-                        <Button mnemonicParsing="false" text="Delete" />
+                         <Button mnemonicParsing="false" onAction="#newMovie" text="New"/>
+                         <Button mnemonicParsing="false" onAction="#deleteMovie" text="Delete"/>
                      </children>
                   </HBox>
                </children>
