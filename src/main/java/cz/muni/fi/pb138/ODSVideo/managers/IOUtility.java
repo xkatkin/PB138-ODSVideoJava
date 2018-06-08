@@ -51,14 +51,14 @@ public interface IOUtility {
      * @throws IllegalArgumentException if document is null or document parsing failed
      * @return map of categories containing data from document
      */
-    Set<Category> transformToList(SpreadsheetDocument document);
+    Set<Category> transformToSet(SpreadsheetDocument document);
 
     /**
      * Transforms list of categories to SpreadsheetDocument format
-     * @param categoryList to be transformed
+     * @param categoryList categories to be transformed
      * @throws IllegalArgumentException if map is null
      * @return SpreadsheetDocument containing data from map
      */
-    SpreadsheetDocument transformToDocument(List<Category> categoryList);
+    SpreadsheetDocument transformToDocument(Set<Category> categoryList);
 
 }

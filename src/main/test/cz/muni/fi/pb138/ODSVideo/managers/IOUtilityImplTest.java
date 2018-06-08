@@ -26,7 +26,7 @@ class IOUtilityImplTest {
 
     @Test
     void transformToMapNullParameter() {
-        assertThatThrownBy(() -> io.transformToMap(null))
+        assertThatThrownBy(() -> io.transformToSet(null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -38,12 +38,12 @@ class IOUtilityImplTest {
 
     @Test
     void transformInvalidFile() {
-        assertThatThrownBy(() -> io.transformToMap(io.readFile("target/test-classes/invalid.ods"))).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> io.transformToSet(io.readFile("target/test-classes/invalid.ods"))).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void transformValidFile() throws IOException {
-        assertThat(io.transformToMap(io.readFile("target/test-classes/sample_valid.ods")))
+        assertThat(io.transformToSet(io.readFile("target/test-classes/sample_valid.ods")))
                 .isNotNull();
     }
     @Test

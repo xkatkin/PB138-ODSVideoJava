@@ -83,7 +83,7 @@ class MovieManagerImplTest {
 
         manager.createMovie(category, movie);
         assertTrue(movie.getStatus().equals(Status.AVAILABLE));
-        assertTrue(manager.findMovie(category, movie.getName()).equals(movie));
+        assertTrue(manager.findByName(category, movie.getName()).equals(movie));
     }
 
     @Test
@@ -138,7 +138,7 @@ class MovieManagerImplTest {
 
         manager.createMovie(category, movie1);
         assertTrue(manager.findAllMovies(category).size() == 1);
-        manager.deleteMovie(category, movie2.getName());
+        manager.deleteMovie(category, movie2);
         assertTrue(manager.findAllMovies(category).size() == 1);
     }
 
@@ -149,7 +149,7 @@ class MovieManagerImplTest {
 
         manager.createMovie(category, movie);
         assertTrue(manager.findAllMovies(category).size() == 1);
-        manager.deleteMovie(category, movie.getName());
+        manager.deleteMovie(category, movie);
         assertTrue(manager.findAllMovies(category).size() == 0);
     }
 
@@ -199,14 +199,14 @@ class MovieManagerImplTest {
         manager.createMovie(category, movie);
         movie.setLength(150);
         manager.updateMovie(category, movie);
-        Movie movie1 = manager.findMovie(category, movie.getName());
+        Movie movie1 = manager.findByName(category, movie.getName());
         assertTrue(movie1.getLength() == 150);
     }
 
     @Test
     void findMovieNonexistent() {
         Category category = testCategory().build();
-        assertTrue(manager.findMovie(category, "Sharks") == null);
+        assertTrue(manager.findByName(category, "Sharks") == null);
     }
 
     @Test
@@ -214,7 +214,7 @@ class MovieManagerImplTest {
         Movie movie = testMovie2Builder().build();
         Category category = testCategory().build();
         manager.createMovie(category, movie);
-        assertTrue(manager.findMovie(category, movie.getName()).equals(movie));
+        assertTrue(manager.findByName(category, movie.getName()).equals(movie));
     }
 
     @Test

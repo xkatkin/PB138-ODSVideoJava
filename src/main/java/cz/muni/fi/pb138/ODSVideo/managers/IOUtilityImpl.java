@@ -56,7 +56,7 @@ public class IOUtilityImpl implements IOUtility {
     }
 
     @Override
-    public Set<Category> transformToList(SpreadsheetDocument document) {
+    public Set<Category> transformToSet(SpreadsheetDocument document) {
         Objects.requireNonNull(document);
 
         Set<Category> categories = new HashSet<>();
@@ -104,7 +104,7 @@ public class IOUtilityImpl implements IOUtility {
     }
 
     @Override
-    public SpreadsheetDocument transformToDocument(List<Category> categoryList) {
+    public SpreadsheetDocument transformToDocument(Set<Category> categoryList) {
         Objects.requireNonNull(categoryList);
 
         SpreadsheetDocument document = null;

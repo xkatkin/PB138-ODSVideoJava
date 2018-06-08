@@ -114,7 +114,7 @@ public class AppController {
 
     private void initDatabase(File databaseFile) throws IOException {
         database = ioManager.readFile(databaseFile);
-        categoryManager = new CategoryManagerImpl(ioManager.transformToList(database));
+        categoryManager = new CategoryManagerImpl(ioManager.transformToSet(database));
         movieManager = new MovieManagerImpl();
 
         globalCategorySelector.setDisable(false);
