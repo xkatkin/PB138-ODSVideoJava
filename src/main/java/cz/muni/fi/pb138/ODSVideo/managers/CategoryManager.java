@@ -11,11 +11,11 @@ import java.util.Set;
 public interface CategoryManager {
     /**
      * Adds category in parameter to set of categories
-     * @throws IllegalArgumentException when category is null
+     * @throws IllegalArgumentException when category is null or is already contained in category
      * @throws ValidationException when any of the category's attributes are null
      * @param category category to be added
      */
-    void createCategory(Category category) throws ValidationException, IllegalEntityException;
+    void createCategory(Category category) throws ValidationException;
 
     /**
      * Deletes category from map, if category doesn't exist, nothing happens

@@ -1,5 +1,6 @@
 package cz.muni.fi.pb138.ODSVideo.managers;
 
+import cz.muni.fi.pb138.ODSVideo.exceptions.IllegalEntityException;
 import cz.muni.fi.pb138.ODSVideo.exceptions.ValidationException;
 import cz.muni.fi.pb138.ODSVideo.models.Category;
 import cz.muni.fi.pb138.ODSVideo.models.Movie;
@@ -14,14 +15,18 @@ public class CategoryManagerImpl implements CategoryManager {
     private Set<Category> categories;
 
     public CategoryManagerImpl(Set<Category> categories) {
-        Objects.requireNonNull(categories, "Categories cannot be null");
+        if (categories == null) {
+            throw new IllegalArgumentException("Categories cannot be null");
+        }
 
         this.categories = categories;
     }
 
     @Override
     public void createCategory(Category category) throws ValidationException {
-        Objects.requireNonNull(category, "Category cannot be null");
+        if (category == null) {
+            throw new IllegalArgumentException("Category cannot be null");
+        }
 
         if (!isValid(category)) {
             throw new ValidationException("Category is invalid");
@@ -36,15 +41,17 @@ public class CategoryManagerImpl implements CategoryManager {
 
     @Override
     public void deleteCategory(Category category) {
-        Objects.requireNonNull(category, "Category cannot be null");
-
+        if (category == null) {
+            throw new IllegalArgumentException("Category cannot be null");
+        }
         categories.remove(category);
     }
 
     @Override
     public Category findCategory(Category category) {
-        Objects.requireNonNull(category, "Category cannot be null");
-
+        if (category == null) {
+            throw new IllegalArgumentException("Category cannot be null");
+        }
         return categories.stream()
                 .filter(c -> c.equals(category))
                 .findAny()
@@ -53,10 +60,9 @@ public class CategoryManagerImpl implements CategoryManager {
 
     @Override
     public void moveMovie(Category from, Category into, Movie movie) {
-        Objects.requireNonNull(from);
-        Objects.requireNonNull(into);
-        Objects.requireNonNull(movie);
-
+        if (from == null || into == null || movie == null) {
+            throw new IllegalArgumentException("parameters cannot be null");
+        }
         from.getMovies().remove(movie);
         into.getMovies().add(movie);
 
