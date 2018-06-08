@@ -15,11 +15,16 @@ public class MovieManagerImpl implements MovieManager {
 
     @Override
     public void createMovie(Category category, Movie movie) throws ValidationException {
-        Objects.requireNonNull(category);
-        Objects.requireNonNull(movie);
+        if (category == null || movie == null) {
+            throw new IllegalArgumentException("parameter cannot be null");
+        }
 
         if (!isValid(movie)) {
             throw new ValidationException("Movie is not valid");
+        }
+
+        if (movie.getStatus() == null) {
+            movie.setStatus(Status.AVAILABLE);
         }
 
         category.getMovies().add(movie);
@@ -27,16 +32,18 @@ public class MovieManagerImpl implements MovieManager {
 
     @Override
     public void deleteMovie(Category category, Movie movie) {
-        Objects.requireNonNull(category);
-        Objects.requireNonNull(movie);
+        if (category == null || movie == null) {
+            throw new IllegalArgumentException("parameter cannot be null");
+        }
 
         category.getMovies().remove(movie);
     }
 
     @Override
     public void updateMovie(Category category, Movie movie) {
-        Objects.requireNonNull(category);
-        Objects.requireNonNull(movie);
+        if (category == null || movie == null) {
+            throw new IllegalArgumentException("parameter cannot be null");
+        }
 
         category.getMovies().remove(movie);
         category.getMovies().add(movie);
@@ -45,6 +52,9 @@ public class MovieManagerImpl implements MovieManager {
 
     @Override
     public Movie findByName(Category category, String name) {
+        if (category == null || name == null) {
+            throw new IllegalArgumentException("parameter cannot be null");
+        }
         return category.getMovies()
                 .stream()
                 .filter(movie -> movie.getName().equalsIgnoreCase(name))
@@ -54,6 +64,9 @@ public class MovieManagerImpl implements MovieManager {
 
     @Override
     public Set<Movie> findByLength(Category category, int length) {
+        if (category == null) {
+            throw new IllegalArgumentException("category cannot be null");
+        }
         return Collections.unmodifiableSet(
                 category.getMovies()
                         .stream()
@@ -63,6 +76,9 @@ public class MovieManagerImpl implements MovieManager {
 
     @Override
     public Set<Movie> findByActor(Category category, String actor) {
+        if (category == null || actor == null) {
+            throw new IllegalArgumentException("parameter cannot be null");
+        }
         return Collections.unmodifiableSet(
                 category.getMovies()
                         .stream()
@@ -72,6 +88,10 @@ public class MovieManagerImpl implements MovieManager {
 
     @Override
     public Set<Movie> findByYear(Category category, Year year) {
+        if (category == null || year == null) {
+            throw new IllegalArgumentException("parameter cannot be null");
+        }
+
         return Collections.unmodifiableSet(
                 category.getMovies()
                         .stream()
@@ -81,6 +101,9 @@ public class MovieManagerImpl implements MovieManager {
 
     @Override
     public Set<Movie> findByStatus(Category category, Status status) {
+        if (category == null || status == null) {
+            throw new IllegalArgumentException("parameter cannot be null");
+        }
         return Collections.unmodifiableSet(
                 category.getMovies()
                         .stream()
@@ -90,6 +113,9 @@ public class MovieManagerImpl implements MovieManager {
 
     @Override
     public Set<Movie> findAllMovies(Category category) {
+        if (category == null) {
+            throw new IllegalArgumentException("category cannot be null");
+        }
         return Collections.unmodifiableSet(category.getMovies());
     }
 

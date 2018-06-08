@@ -17,14 +17,18 @@ public class IOUtilityImpl implements IOUtility {
 
     @Override
     public SpreadsheetDocument readFile(String path) throws IOException {
-        Objects.requireNonNull(path);
+        if (path == null) {
+            throw new IllegalArgumentException("path cannot be null");
+        }
 
         return readFile(new File(path));
     }
 
     @Override
     public SpreadsheetDocument readFile(File file) throws IOException {
-        Objects.requireNonNull(file);
+        if (file == null) {
+            throw new IllegalArgumentException("file cannot be null");
+        }
 
         SpreadsheetDocument document;
         try {
@@ -37,16 +41,18 @@ public class IOUtilityImpl implements IOUtility {
 
     @Override
     public void writeFile(String path, SpreadsheetDocument document) throws IOException {
-        Objects.requireNonNull(path);
-        Objects.requireNonNull(document);
+        if (path == null || document == null) {
+            throw new IllegalArgumentException("parameter cannot be null");
+        }
 
         writeFile(new File(path), document);
     }
 
     @Override
     public void writeFile(File file, SpreadsheetDocument document) throws IOException {
-        Objects.requireNonNull(file);
-        Objects.requireNonNull(document);
+        if (file == null || document == null) {
+            throw new IllegalArgumentException("parameter cannot be null");
+        }
 
         try {
             document.save(file);
@@ -57,7 +63,9 @@ public class IOUtilityImpl implements IOUtility {
 
     @Override
     public Set<Category> transformToSet(SpreadsheetDocument document) {
-        Objects.requireNonNull(document);
+        if (document == null) {
+            throw new IllegalArgumentException("document cannot be null");
+        }
 
         Set<Category> categories = new HashSet<>();
         document.getTableList()
@@ -104,8 +112,10 @@ public class IOUtilityImpl implements IOUtility {
     }
 
     @Override
-    public SpreadsheetDocument transformToDocument(Set<Category> categoryList) {
-        Objects.requireNonNull(categoryList);
+    public SpreadsheetDocument transformToDocument(Set<Category> categorySet) {
+        if (categorySet == null) {
+            throw new IllegalArgumentException("categorySet cannot be null");
+        }
 
         SpreadsheetDocument document = null;
         try {
@@ -115,7 +125,7 @@ public class IOUtilityImpl implements IOUtility {
         }
 
         document.removeSheet(0);
-        for (Category category : categoryList) {
+        for (Category category : categorySet) {
             Table table = document.appendSheet(category.getName());
             table.removeRowsByIndex(0, 2);
             writeFirstRow(table.appendRow());
