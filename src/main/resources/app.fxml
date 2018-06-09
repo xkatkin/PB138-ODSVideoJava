@@ -43,6 +43,8 @@
                                  text="New Movie"/>
                          <Button fx:id="btDeleteMovie" disable="true" mnemonicParsing="false" onAction="#deleteMovie"
                                  text="Delete Movie"/>
+                         <Button fx:id="btOpenFinder" disable="true" mnemonicParsing="false" onAction="#openFinder"
+                                 text="Find Movies"/>
                      </children>
                   </HBox>
                </children>

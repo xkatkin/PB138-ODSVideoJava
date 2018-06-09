@@ -1,6 +1,5 @@
 package cz.muni.fi.pb138.ODSVideo.managers;
 
-import cz.muni.fi.pb138.ODSVideo.exceptions.IllegalEntityException;
 import cz.muni.fi.pb138.ODSVideo.exceptions.ValidationException;
 import cz.muni.fi.pb138.ODSVideo.models.Category;
 import cz.muni.fi.pb138.ODSVideo.models.Movie;
@@ -41,36 +40,45 @@ public interface MovieManager {
     Movie findByName(Category category, String name);
 
     /**
+     * finds all movies with which name matches query
+     *
+     * @param movies to look in
+     * @param query
+     * @return collection of movies, empty collection if no corresponding movies were found
+     */
+    Set<Movie> findByNamePartial(Set<Movie> movies, String query);
+
+    /**
      * finds all movies with corresponding length
-     * @param category to look for movies in
+     * @param movies to look in
      * @param length of the movies
      * @return collection of movies, empty collection if no corresponding movies were found
      */
-    Set<Movie> findByLength(Category category, int length);
+    Set<Movie> findByLength(Set<Movie> movies, int length);
 
     /**
      * finds all movies where specific actor played
-     * @param category to look for movies in
+     * @param movies to look in
      * @param actor name of the actor
      * @return collection of movies, empty collection if no corresponding movies were found
      */
-    Set<Movie> findByActor(Category category, String actor);
+    Set<Movie> findByActor(Set<Movie> movies, String actor);
 
     /**
      * finds all movies that came out in corresponding year
-     * @param category to look for movies in
+     * @param movies to look in
      * @param year of the movies
      * @return collection of movies, empty collection if no corresponding movies were found
      */
-    Set<Movie> findByYear(Category category, Year year);
+    Set<Movie> findByYear(Set<Movie> movies, Year year);
 
     /**
      * finds all movies with corresponding status
-     * @param category to look for movies in
+     * @param movies to look in
      * @param status of the movies
      * @return collection of movies, empty collection if no corresponding movies were found
      */
-    Set<Movie> findByStatus(Category category, Status status);
+    Set<Movie> findByStatus(Set<Movie> movies, Status status);
 
     /**
      * finds all movies in category

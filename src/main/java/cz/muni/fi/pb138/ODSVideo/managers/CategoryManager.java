@@ -54,4 +54,12 @@ public interface CategoryManager {
      * @return collection of movies in all categories
      */
     Set<Movie> findAllMovies();
+
+    /**
+     * Finds category of given movie
+     *
+     * @return category of movie
+     * @parma movie
+     */
+    Category findCategoryOfMovie(Movie movie);
 }

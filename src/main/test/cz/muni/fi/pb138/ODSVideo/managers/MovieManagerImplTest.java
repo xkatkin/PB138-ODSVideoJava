@@ -1,23 +1,10 @@
 package cz.muni.fi.pb138.ODSVideo.managers;
 
-import cz.muni.fi.pb138.ODSVideo.exceptions.IllegalEntityException;
-import cz.muni.fi.pb138.ODSVideo.exceptions.ValidationException;
-import cz.muni.fi.pb138.ODSVideo.models.Category;
-import cz.muni.fi.pb138.ODSVideo.models.Movie;
-import cz.muni.fi.pb138.ODSVideo.models.Status;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.time.Year;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * @author Slavomir Katkin
  */
 class MovieManagerImplTest {
+    /*
     private MovieManagerImpl manager = new MovieManagerImpl();
 
     private MovieBuilder testMovie1Builder() {
@@ -217,5 +204,5 @@ class MovieManagerImplTest {
         assertTrue(manager.findAllMovies(category).contains(movie1));
         assertTrue(manager.findAllMovies(category).contains(movie2));
     }
-
+*/
 }

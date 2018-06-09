@@ -84,6 +84,15 @@ public class CategoryManagerImpl implements CategoryManager {
 
     }
 
+    @Override
+    public Category findCategoryOfMovie(Movie movie) {
+        return categories
+                .stream()
+                .filter(category -> category.getMovies().contains(movie))
+                .findAny()
+                .orElse(null);
+    }
+
     public void setCategories(Set<Category> categories) {
         this.categories = categories;
     }

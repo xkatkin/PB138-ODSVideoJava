@@ -11,9 +11,14 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.odftoolkit.simple.SpreadsheetDocument;
 
 import java.io.File;
@@ -71,7 +76,11 @@ public class AppController {
     private Button btSaveMovie;
 
     @FXML
+    private Button btOpenFinder;
+
+    @FXML
     private MenuItem miSave;
+
 
 
     private SpreadsheetDocument database;
@@ -98,7 +107,6 @@ public class AppController {
 
         movieSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selectMovie(newValue));
         globalCategorySelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selectCategory(newValue));
-
     }
 
     @FXML
@@ -235,6 +243,24 @@ public class AppController {
 
     }
 
+    @FXML
+    private void openFinder() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("finder.fxml"));
+        Parent root = loader.load();
+        FinderController controller = loader.getController();
+        controller.setCategoryManager(categoryManager);
+        controller.setMovieManager(movieManager);
+
+        Stage stage = new Stage();
+        stage.setTitle("Find movies");
+        stage.setScene(new Scene(root, 800, 450));
+        stage.setResizable(false);
+        stage.initOwner(main.getScene().getWindow());
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+    }
+
+
 
     private void initDatabase(File databaseFile) throws IOException {
         database = ioManager.readFile(databaseFile);
@@ -294,10 +320,12 @@ public class AppController {
             btDeleteCategory.setDisable(true);
             btRenameCategory.setDisable(true);
             btNewMovie.setDisable(true);
+            btOpenFinder.setDisable(true);
         } else {
             btDeleteCategory.setDisable(false);
             btRenameCategory.setDisable(false);
             btNewMovie.setDisable(false);
+            btOpenFinder.setDisable(false);
         }
     }
 

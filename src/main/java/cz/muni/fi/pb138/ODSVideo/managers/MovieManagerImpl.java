@@ -7,7 +7,6 @@ import cz.muni.fi.pb138.ODSVideo.models.Status;
 
 import java.time.Year;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -52,49 +51,64 @@ public class MovieManagerImpl implements MovieManager {
     }
 
     @Override
-    public Set<Movie> findByLength(Category category, int length) {
-        if (category == null) {
-            throw new IllegalArgumentException("category cannot be null");
+    public Set<Movie> findByNamePartial(Set<Movie> movies, String query) {
+        if (movies == null || query == null) {
+            throw new IllegalArgumentException("parameter cannot be null");
         }
+
         return Collections.unmodifiableSet(
-                category.getMovies()
+                movies
+                        .stream()
+                        .filter(movie -> movie.getName().toLowerCase().contains(query.trim().toLowerCase()))
+                        .collect(Collectors.toSet()));
+    }
+
+    @Override
+    public Set<Movie> findByLength(Set<Movie> movies, int length) {
+        if (movies == null) {
+            throw new IllegalArgumentException("parameter cannot be null");
+        }
+
+        return Collections.unmodifiableSet(
+                movies
                         .stream()
                         .filter(movie -> movie.getLength() == length)
                         .collect(Collectors.toSet()));
     }
 
     @Override
-    public Set<Movie> findByActor(Category category, String actor) {
-        if (category == null || actor == null) {
+    public Set<Movie> findByActor(Set<Movie> movies, String actor) {
+        if (movies == null || actor == null) {
             throw new IllegalArgumentException("parameter cannot be null");
         }
+
         return Collections.unmodifiableSet(
-                category.getMovies()
+                movies
                         .stream()
                         .filter(movie -> movie.getActors().contains(actor))
                         .collect(Collectors.toSet()));
     }
 
     @Override
-    public Set<Movie> findByYear(Category category, Year year) {
-        if (category == null || year == null) {
+    public Set<Movie> findByYear(Set<Movie> movies, Year year) {
+        if (movies == null || year == null) {
             throw new IllegalArgumentException("parameter cannot be null");
         }
 
         return Collections.unmodifiableSet(
-                category.getMovies()
+                movies
                         .stream()
                         .filter(movie -> movie.getReleaseYear().equals(year))
                         .collect(Collectors.toSet()));
     }
 
     @Override
-    public Set<Movie> findByStatus(Category category, Status status) {
-        if (category == null || status == null) {
+    public Set<Movie> findByStatus(Set<Movie> movies, Status status) {
+        if (movies == null || status == null) {
             throw new IllegalArgumentException("parameter cannot be null");
         }
         return Collections.unmodifiableSet(
-                category.getMovies()
+                movies
                         .stream()
                         .filter(movie -> movie.getStatus().equals(status))
                         .collect(Collectors.toSet()));
