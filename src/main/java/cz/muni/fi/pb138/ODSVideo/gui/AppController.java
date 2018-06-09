@@ -129,7 +129,12 @@ public class AppController {
         if (database == null) return;
         SpreadsheetDocument saved = ioManager.transformToDocument(categoryManager.getCategories());
         ioManager.writeFile(databaseFile, saved);
-        System.out.println("Saved!");
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Saved");
+        alert.setHeaderText(null);
+        alert.setContentText("Database saved successfully to " + databaseFile.getName());
+
+        alert.showAndWait();
     }
 
     @FXML

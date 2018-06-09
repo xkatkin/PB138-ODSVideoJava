@@ -10,8 +10,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.time.Year;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class FinderController {
 
@@ -44,12 +47,17 @@ public class FinderController {
     @FXML
     private void findMovies() {
         RadioButton selected = (RadioButton) findParameter.getSelectedToggle();
+        String param = selected.getText().trim().toLowerCase();
 
         Set<Movie> movies = categoryManager.findAllMovies();
         Set<Movie> results = new HashSet<>();
         String query = tfFindQuery.getText().trim();
 
-        switch (selected.getText().toLowerCase()) {
+        if (!validateQuery(param, query)) {
+            return;
+        }
+
+        switch (param) {
             case "name":
                 results = movieManager.findByNamePartial(movies, query);
                 break;
@@ -68,6 +76,36 @@ public class FinderController {
         }
 
         tbFindResult.getItems().setAll(results);
+    }
+
+    private boolean validateQuery(String param, String query) {
+        String reason = null;
+        if (param.equals("length") || param.equals("release")) {
+            try {
+                Integer.valueOf(query);
+            } catch (NumberFormatException nfe) {
+                reason = "\"" + query + "\" is not a valid number!";
+            }
+        } else if (param.equals("status")) {
+            try {
+                Status.valueOf(query.toUpperCase());
+            } catch (IllegalArgumentException iae) {
+                List<String> statuses = Arrays.stream(Status.values()).map(Status::toString).collect(Collectors.toList());
+                reason = "\"" + query + "\" is not a valid status. Valid statuses are:\n" + String.join("\n", statuses);
+            }
+        }
+
+        if (reason != null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Invalid input");
+            alert.setHeaderText("Invalid input");
+            alert.setContentText(reason);
+
+            alert.showAndWait();
+            return false;
+        }
+
+        return true;
     }
 
     public void setCategoryManager(CategoryManager categoryManager) {
