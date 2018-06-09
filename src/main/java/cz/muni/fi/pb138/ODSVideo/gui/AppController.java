@@ -6,13 +6,12 @@ import cz.muni.fi.pb138.ODSVideo.models.Category;
 import cz.muni.fi.pb138.ODSVideo.models.Movie;
 import cz.muni.fi.pb138.ODSVideo.models.Status;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.odftoolkit.simple.SpreadsheetDocument;
@@ -39,25 +38,46 @@ public class AppController {
     private ListView<String> movieSelector;
 
     @FXML
-    private TextField movieName;
+    private TextField tfMovieName;
 
     @FXML
-    private TextField movieLength;
+    private TextField tfMovieLength;
 
     @FXML
-    private TextField movieActors;
+    private TextField tfMovieActors;
 
     @FXML
-    private TextField movieRelease;
+    private TextField tfMovieRelease;
 
     @FXML
-    private ComboBox<Status> movieStatus;
+    private ComboBox<Status> cbMovieStatus;
+
+    @FXML
+    private Button btNewCategory;
+
+    @FXML
+    private Button btDeleteCategory;
+
+    @FXML
+    private Button btRenameCategory;
+
+    @FXML
+    private Button btNewMovie;
+
+    @FXML
+    private Button btDeleteMovie;
+
+    @FXML
+    private Button btSaveMovie;
+
+    @FXML
+    private MenuItem miSave;
 
 
     private SpreadsheetDocument database;
     private File databaseFile;
-    private Category selectedCategory;
-    private Movie selectedMovie;
+    private ObjectProperty<Category> selectedCategory = new SimpleObjectProperty<>();
+    private ObjectProperty<Movie> selectedMovie = new SimpleObjectProperty<>();
 
     private IOUtility ioManager;
     private CategoryManager categoryManager;
@@ -68,11 +88,16 @@ public class AppController {
     private void initialize() {
         ioManager = new IOUtilityImpl();
 
+        cbMovieStatus.setItems(FXCollections.observableArrayList(Status.values()));
 
-        movieStatus.setItems(FXCollections.observableArrayList(Status.values()));
+        makeTextFieldNumeric(tfMovieLength);
+        makeTextFieldNumeric(tfMovieRelease);
 
-        makeTextFieldNumeric(movieLength);
-        makeTextFieldNumeric(movieRelease);
+        selectedCategory.addListener((observable, oldValue, newValue) -> toggleCategoryButtons(newValue));
+        selectedMovie.addListener((observable, oldValue, newValue) -> toggleMovieButtons(newValue));
+
+        movieSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selectMovie(newValue));
+        globalCategorySelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selectCategory(newValue));
 
     }
 
@@ -91,116 +116,17 @@ public class AppController {
         }
     }
 
-    private void initDatabase(File databaseFile) throws IOException {
-        database = ioManager.readFile(databaseFile);
-        categoryManager = new CategoryManagerImpl(ioManager.transformToSet(database));
-        movieManager = new MovieManagerImpl();
-
-        globalCategorySelector.setDisable(false);
-
-        updateCategoriesList();
-
-        movieSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selectMovie(newValue));
-
-        globalCategorySelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> selectCategory(newValue));
-    }
-
-    private void selectCategory(String name) {
-        if (name == null) return;
-        selectedCategory = categoryManager.findCategory(name);
-
-        updateMoviesList();
-    }
-
-    private void selectMovie(String name) {
-        if (name == null) return;
-        selectedMovie = movieManager.findByName(selectedCategory, name);
-
-        if (selectedMovie != null) {
-            localCategorySelector.setDisable(false);
-            movieStatus.setDisable(false);
-            localCategorySelector.getSelectionModel().select(selectedCategory.getName());
-
-            movieName.setText(selectedMovie.getName());
-            movieLength.setText(String.valueOf(selectedMovie.getLength()));
-            movieActors.setText(String.join(", ", selectedMovie.getActors()));
-            movieRelease.setText(String.valueOf(selectedMovie.getReleaseYear()));
-            movieStatus.getSelectionModel().select(selectedMovie.getStatus());
-        }
-    }
-
-    @FXML
-    private void saveMovie() throws ValidationException {
-        movieManager.deleteMovie(selectedCategory, selectedMovie);
-
-        selectedMovie.setName(movieName.getText());
-        selectedMovie.setLength(Integer.parseInt(movieLength.getText())); // TODO validate
-        selectedMovie.setActors(new HashSet<>(Arrays.asList(movieActors.getText().split(", "))));
-        selectedMovie.setReleaseYear(Year.parse(movieRelease.getText()));
-        selectedMovie.setStatus(movieStatus.getValue());
-
-        movieManager.createMovie(selectedCategory, selectedMovie);
-        Category newCategory = categoryManager.findCategory(localCategorySelector.getValue());
-        if (!newCategory.equals(selectedCategory)) {
-            categoryManager.moveMovie(selectedCategory, newCategory, selectedMovie);
-            globalCategorySelector.getSelectionModel().select(newCategory.getName());
-        }
-
-        updateMoviesList();
-    }
-
-    private void makeTextFieldNumeric(TextField textField) {
-        textField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*")) {
-                textField.setText(newValue.replaceAll("[^\\d]", ""));
-            }
-        });
-    }
-
-    private void updateCategoriesList() {
-        ObservableList<String> categoriesNames = categoryManager.getCategories().stream()
-                .map(Category::getName)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), FXCollections::observableArrayList));
-
-        globalCategorySelector.setItems(categoriesNames);
-        localCategorySelector.setItems(categoriesNames);
-    }
-
-    private void updateMoviesList() {
-        ObservableList<String> movieNames = selectedCategory.getMovies().stream()
-                .map(Movie::getName)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), FXCollections::observableArrayList));
-        movieSelector.setItems(movieNames);
-    }
-
     @FXML
     private void saveFile() throws IOException {
+        if (database == null) return;
         SpreadsheetDocument saved = ioManager.transformToDocument(categoryManager.getCategories());
         ioManager.writeFile(databaseFile, saved);
         System.out.println("Saved!");
     }
 
     @FXML
-    private void deleteMovie() {
-        if (selectedMovie != null) {
-            movieManager.deleteMovie(selectedCategory, selectedMovie);
-            updateMoviesList();
-            movieSelector.getSelectionModel().selectFirst();
-
-        }
-    }
-
-
-    @FXML
-    private void newMovie() {
-        selectedMovie = new Movie();
-
-        localCategorySelector.getSelectionModel().select(selectedCategory.getName());
-        movieName.setText("");
-        movieLength.setText("");
-        movieActors.setText("");
-        movieRelease.setText("");
-        movieStatus.getSelectionModel().select(Status.AVAILABLE);
+    private void quitApplication() {
+        Platform.exit();
     }
 
     @FXML
@@ -220,19 +146,20 @@ public class AppController {
                 e.printStackTrace();
             }
             updateCategoriesList();
+            globalCategorySelector.setDisable(false);
             globalCategorySelector.getSelectionModel().select(category.getName());
         });
     }
 
     @FXML
     private void renameCategory() {
-        TextInputDialog dialog = new TextInputDialog(selectedCategory.getName());
+        TextInputDialog dialog = new TextInputDialog(selectedCategory.get().getName());
         dialog.setTitle("Rename category");
         dialog.setHeaderText("Rename category");
         dialog.setContentText("Please enter new category name:");
 
         dialog.showAndWait().ifPresent(name -> {
-            selectedCategory.setName(name);
+            selectedCategory.get().setName(name);
             updateCategoriesList();
             globalCategorySelector.getSelectionModel().select(name);
         });
@@ -240,17 +167,168 @@ public class AppController {
 
     @FXML
     private void deleteCategory() {
-        if (selectedCategory != null) {
-            categoryManager.deleteCategory(selectedCategory);
-            updateCategoriesList();
+        if (!selectedCategory.get().getMovies().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Error removing category");
+            alert.setContentText("Can't remove non-empty category");
+
+            alert.showAndWait();
+            return;
+        }
+
+        categoryManager.deleteCategory(selectedCategory.get());
+        updateCategoriesList();
+        updateMoviesList();
+
+        if (categoryManager.getCategories().isEmpty()) {
+            globalCategorySelector.setDisable(true);
+            movieSelector.setItems(null);
+            selectedCategory.set(null);
+            selectedMovie.set(null);
+        } else {
             globalCategorySelector.getSelectionModel().selectFirst();
         }
 
-        // TODO fix exception
     }
 
     @FXML
-    private void quitApplication() {
-        Platform.exit();
+    private void createMovie() {
+        selectedMovie.set(new Movie());
+
+        localCategorySelector.getSelectionModel().select(selectedCategory.get().getName());
+        tfMovieName.setText("");
+        tfMovieLength.setText("");
+        tfMovieActors.setText("");
+        tfMovieRelease.setText("");
+        cbMovieStatus.getSelectionModel().select(Status.AVAILABLE);
+    }
+
+    @FXML
+    private void saveMovie() throws ValidationException {
+        movieManager.deleteMovie(selectedCategory.get(), selectedMovie.get());
+
+        Movie movie = selectedMovie.get();
+
+        movie.setName(tfMovieName.getText());
+        movie.setLength(Integer.parseInt(tfMovieLength.getText()));
+        movie.setActors(new HashSet<>(Arrays.asList(tfMovieActors.getText().split(", "))));
+        movie.setReleaseYear(Year.of(Integer.parseInt(tfMovieRelease.getText())));
+        movie.setStatus(cbMovieStatus.getValue());
+
+        movieManager.createMovie(selectedCategory.get(), movie);
+        Category newCategory = categoryManager.findCategory(localCategorySelector.getValue());
+
+        if (!newCategory.equals(selectedCategory.get())) {
+            categoryManager.moveMovie(selectedCategory.get(), newCategory, movie);
+            globalCategorySelector.getSelectionModel().select(newCategory.getName());
+        }
+
+        updateMoviesList();
+    }
+
+    @FXML
+    private void deleteMovie() {
+        movieManager.deleteMovie(selectedCategory.get(), selectedMovie.get());
+        updateMoviesList();
+        movieSelector.getSelectionModel().selectFirst();
+
+    }
+
+
+    private void initDatabase(File databaseFile) throws IOException {
+        database = ioManager.readFile(databaseFile);
+        categoryManager = new CategoryManagerImpl(ioManager.transformToSet(database));
+        movieManager = new MovieManagerImpl();
+
+        globalCategorySelector.setDisable(false);
+        miSave.setDisable(false);
+        btNewCategory.setDisable(false);
+
+        updateCategoriesList();
+
+        globalCategorySelector.getSelectionModel().selectFirst();
+    }
+
+    private void selectMovie(String name) {
+        if (name == null) return;
+        selectedMovie.set(movieManager.findByName(selectedCategory.get(), name));
+
+        localCategorySelector.getSelectionModel().select(selectedCategory.get().getName());
+
+        Movie movie = selectedMovie.get();
+
+        tfMovieName.setText(movie.getName());
+        tfMovieLength.setText(String.valueOf(movie.getLength()));
+        tfMovieActors.setText(String.join(", ", movie.getActors()));
+        tfMovieRelease.setText(String.valueOf(movie.getReleaseYear()));
+        cbMovieStatus.getSelectionModel().select(movie.getStatus());
+
+    }
+
+    private void selectCategory(String name) {
+        if (name == null) return;
+        selectedCategory.set(categoryManager.findCategory(name));
+
+        updateMoviesList();
+    }
+
+    private void updateCategoriesList() {
+        ObservableList<String> categoriesNames = categoryManager.getCategories().stream()
+                .map(Category::getName)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), FXCollections::observableArrayList));
+
+        globalCategorySelector.setItems(categoriesNames);
+        localCategorySelector.setItems(categoriesNames);
+    }
+
+    private void updateMoviesList() {
+        ObservableList<String> movieNames = selectedCategory.get().getMovies().stream()
+                .map(Movie::getName)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), FXCollections::observableArrayList));
+        movieSelector.setItems(movieNames);
+    }
+
+    private void toggleCategoryButtons(Category category) {
+        if (category == null) {
+            btDeleteCategory.setDisable(true);
+            btRenameCategory.setDisable(true);
+            btNewMovie.setDisable(true);
+        } else {
+            btDeleteCategory.setDisable(false);
+            btRenameCategory.setDisable(false);
+            btNewMovie.setDisable(false);
+        }
+    }
+
+    private void toggleMovieButtons(Movie movie) {
+        if (movie == null) {
+            btDeleteMovie.setDisable(true);
+            btSaveMovie.setDisable(true);
+            localCategorySelector.setDisable(true);
+            tfMovieName.setDisable(true);
+            tfMovieLength.setDisable(true);
+            tfMovieRelease.setDisable(true);
+            tfMovieActors.setDisable(true);
+            cbMovieStatus.setDisable(true);
+        } else {
+            btDeleteMovie.setDisable(false);
+            btSaveMovie.setDisable(false);
+            localCategorySelector.setDisable(false);
+            tfMovieName.setDisable(false);
+            tfMovieLength.setDisable(false);
+            tfMovieRelease.setDisable(false);
+            tfMovieActors.setDisable(false);
+            cbMovieStatus.setDisable(false);
+        }
+    }
+
+
+    private void makeTextFieldNumeric(TextField textField) {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                textField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
     }
 }

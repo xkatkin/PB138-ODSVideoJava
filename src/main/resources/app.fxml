@@ -12,14 +12,9 @@
           <items>
               <MenuItem mnemonicParsing="false" onAction="#selectFile" text="Open…"/>
             <SeparatorMenuItem mnemonicParsing="false" />
-              <MenuItem mnemonicParsing="false" onAction="#saveFile" text="Save"/>
+              <MenuItem fx:id="miSave" disable="true" mnemonicParsing="false" onAction="#saveFile" text="Save"/>
             <SeparatorMenuItem mnemonicParsing="false" />
               <MenuItem mnemonicParsing="false" onAction="#quitApplication" text="Quit"/>
-          </items>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Help">
-          <items>
-            <MenuItem mnemonicParsing="false" text="About MyHelloApp" />
           </items>
         </Menu>
       </menus>
@@ -33,16 +28,21 @@
                    <HBox alignment="CENTER_LEFT" prefHeight="112.0" prefWidth="370.0" spacing="10.0"
                          VBox.vgrow="ALWAYS">
                      <children>
-                         <Button mnemonicParsing="false" onAction="#createCategory" text="New"/>
-                         <Button mnemonicParsing="false" onAction="#deleteCategory" text="Delete"/>
-                         <Button mnemonicParsing="false" onAction="#renameCategory" text="Rename"/>
+                         <Button fx:id="btNewCategory" disable="true" mnemonicParsing="false" onAction="#createCategory"
+                                 text="New Category"/>
+                         <Button fx:id="btDeleteCategory" disable="true" mnemonicParsing="false"
+                                 onAction="#deleteCategory" text="Delete Category"/>
+                         <Button fx:id="btRenameCategory" disable="true" mnemonicParsing="false"
+                                 onAction="#renameCategory" text="Rename Category"/>
                      </children>
                   </HBox>
                    <ListView fx:id="movieSelector" prefHeight="653.0" prefWidth="384.0"/>
                    <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                         <Button mnemonicParsing="false" onAction="#newMovie" text="New"/>
-                         <Button mnemonicParsing="false" onAction="#deleteMovie" text="Delete"/>
+                         <Button fx:id="btNewMovie" disable="true" mnemonicParsing="false" onAction="#createMovie"
+                                 text="New Movie"/>
+                         <Button fx:id="btDeleteMovie" disable="true" mnemonicParsing="false" onAction="#deleteMovie"
+                                 text="Delete Movie"/>
                      </children>
                   </HBox>
                </children>
@@ -70,21 +70,21 @@
                      <Label text="Actors" GridPane.rowIndex="3"/>
                      <Label text="Release year" GridPane.rowIndex="4"/>
                      <Label text="Status" GridPane.rowIndex="5"/>
-                     <TextField GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                     <TextField fx:id="movieName" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                     <TextField fx:id="movieLength" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <TextField fx:id="tfMovieLength" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="2">
                          <GridPane.margin>
                              <Insets/>
                          </GridPane.margin>
                      </TextField>
-                     <TextField fx:id="movieActors" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-                     <TextField fx:id="movieRelease" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                     <TextField fx:id="tfMovieName" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                     <TextField fx:id="tfMovieActors" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                     <TextField fx:id="tfMovieRelease" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
                      <Label text="Genre"/>
-                     <Button alignment="CENTER" mnemonicParsing="false" onAction="#saveMovie" prefHeight="48.0"
-                             prefWidth="110.0" text="Save" GridPane.rowIndex="6"/>
+                     <Button fx:id="btSaveMovie" alignment="CENTER" disable="true" mnemonicParsing="false"
+                             onAction="#saveMovie" prefHeight="48.0" prefWidth="110.0" text="Save Movie"
+                             GridPane.rowIndex="6"/>
                      <ComboBox fx:id="localCategorySelector" disable="true" prefHeight="26.0" prefWidth="594.0"
                                GridPane.columnIndex="1"/>
-                     <ComboBox fx:id="movieStatus" disable="true" prefHeight="26.0" prefWidth="628.0"
+                     <ComboBox fx:id="cbMovieStatus" disable="true" prefHeight="26.0" prefWidth="628.0"
                                GridPane.columnIndex="1" GridPane.rowIndex="5"/>
                  </children>
              </GridPane>
