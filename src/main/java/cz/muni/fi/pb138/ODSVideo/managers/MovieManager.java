@@ -43,7 +43,7 @@ public interface MovieManager {
      * finds all movies with which name matches query
      *
      * @param movies to look in
-     * @param query
+     * @param query to filter by
      * @return collection of movies, empty collection if no corresponding movies were found
      */
     Set<Movie> findByNamePartial(Set<Movie> movies, String query);

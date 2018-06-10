@@ -1,10 +1,23 @@
 package cz.muni.fi.pb138.ODSVideo.managers;
 
+import cz.muni.fi.pb138.ODSVideo.exceptions.ValidationException;
+import cz.muni.fi.pb138.ODSVideo.models.Category;
+import cz.muni.fi.pb138.ODSVideo.models.Movie;
+import cz.muni.fi.pb138.ODSVideo.models.Status;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.time.Year;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * @author Slavomir Katkin
  */
 class MovieManagerImplTest {
-    /*
+
     private MovieManagerImpl manager = new MovieManagerImpl();
 
     private MovieBuilder testMovie1Builder() {
@@ -160,7 +173,7 @@ class MovieManagerImplTest {
         Category category = testCategory().build();
 
         manager.createMovie(category, movie);
-        assertTrue(manager.findByLength(category, movie.getLength()).contains(movie));
+        assertTrue(manager.findByLength(category.getMovies(), movie.getLength()).contains(movie));
     }
 
     @Test
@@ -170,7 +183,7 @@ class MovieManagerImplTest {
 
         String actor = movie.getActors().iterator().next();
         manager.createMovie(category, movie);
-        assertTrue(manager.findByActor(category, actor).contains(movie));
+        assertTrue(manager.findByActor(category.getMovies(), actor).contains(movie));
     }
 
     @Test
@@ -179,7 +192,7 @@ class MovieManagerImplTest {
         Category category = testCategory().build();
 
         manager.createMovie(category, movie);
-        assertTrue(manager.findByYear(category, movie.getReleaseYear()).contains(movie));
+        assertTrue(manager.findByYear(category.getMovies(), movie.getReleaseYear()).contains(movie));
     }
 
     @Test
@@ -188,7 +201,7 @@ class MovieManagerImplTest {
         Category category = testCategory().build();
 
         manager.createMovie(category, movie);
-        assertTrue(manager.findByStatus(category, movie.getStatus()).contains(movie));
+        assertTrue(manager.findByStatus(category.getMovies(), movie.getStatus()).contains(movie));
     }
 
     @Test
@@ -204,5 +217,5 @@ class MovieManagerImplTest {
         assertTrue(manager.findAllMovies(category).contains(movie1));
         assertTrue(manager.findAllMovies(category).contains(movie2));
     }
-*/
+
 }
