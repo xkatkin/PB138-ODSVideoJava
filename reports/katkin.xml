@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="cs">
+    <info>
+        <title>Záverečná správa o projekte</title>
+        <subtitle>Desktopová aplikace pro správu videotéky v souboru ve formátu Open Document Spreadsheet</subtitle>
+        <author>
+            <firstname>Slavomír</firstname>
+            <surname>Katkin</surname>
+        </author>
+    </info>
+    <section>
+        <title>Modely</title>
+        <para>
+            Na reprezentáciu listov v .ods súbore som vytvoril datový model Category. Každý list v súbore je
+            reprezentovaný práve jednou kategóriou. Tá má atribúty "name" (String) a "movies" (Set typu Movie),
+            pričom nemôžu existovať dve kategórie s rovnakým menom.
+        </para>
+        <para>
+            Jednotlivé filmy (pôvodne riadky v tabuľke) sú reprezentované modelom Movie. Pri ňom si pamätáme "name"
+            (String), "length" (int), "status" (Status - enumový typ, možné hodnoty sú AVAIABLE, RENTED a LOST),
+            "releaseYear" (Year) a "actors" (Set typu String). Rovnako ako kategórie, filmy sú unikátne na meno.
+        </para>
+    </section>
+    <section>
+        <title>Manageri</title>
+        <para>
+            Pre každý typ existuje aj jeho Manager. CategoryManager si udržuje množinu kategórií a nad tou aj operuje.
+            Pôvodný návrh datovej štruktúry bol slovník (HashMap), kde kľúč bol meno kategórie a hodnotou kategória
+            samotná, no tento návrh sa ukázal ako zbytočne zložitý a nekonzistentný (zmena názvu). Kvôli jednoduchosti
+            bol nahradený množinou. Okrem klasických operácií (create, delete, find) umožňuje CategoryManager aj
+            presúvanie filmov medzi jednotlivými kategóriami.
+        </para>
+        <para>
+            Na rozdiel od CategoryManagera, MovieManager si žiadne data nedrží (dal by sa vyhlásiť za statickú triedu).
+            Vždy pri volaní jeho funkcií je mu daná kategória, z ktorej si vyberie jej množinou filmov, alebo rovno
+            množina samotná. MovieManager taktiež implementuje klasické operácie, plus vyhľadávanie podľa jednotlivých
+            atribútov a vyhľadanie kategórie ku konkrétnemu filmu.
+        </para>
+    </section>
+    <section>
+        <title>Testovanie</title>
+        <para>
+            Ku každému managerovi som napísal sadu jednotkových testov. Testovaná je konzistencia dát pri používaní
+            jednotlivých funckií a vyhodenie správnych výnimok pri nežiadaných situáciach. Využitá je aj vlastná výnimka.
+            ValidationException sa vyhadzuje v prípade, že hociktorá z atribút má nullovú hodnotu. Nullové vstupy sa
+            riešia pomocou IllegalArgumentException.
+        </para>
+        <para>
+            Pri testoch boli pre zjednodušenie vytvárania testovacích objektov použité triedy CategoryBuilder a
+            MovieBuilder. Tieto buildre umožňujú jednoduché a prehľadné nastavenie atribútov pred vytvorením objektu.
+            Vďaka tomu som sa vyhol volaniu Set funkcií v každom teste.
+        </para>
+    </section>
+</article>
