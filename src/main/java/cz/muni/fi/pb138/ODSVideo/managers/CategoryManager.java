@@ -25,7 +25,6 @@ public interface CategoryManager {
 
     /**
      * Finds category
-     *
      * @throws IllegalArgumentException if category does not exist in database
      * */
     Category findCategory(String name);
@@ -42,11 +41,15 @@ public interface CategoryManager {
     void moveMovie(Category from, Category into, Movie movie);
 
     /**
-     * returns all categories
+     * getter for categories
      * @return collection of categories
      */
     Set<Category> getCategories();
 
+    /**
+     * setter for categories
+     * @param categories to be set
+     */
     void setCategories(Set<Category> categories);
 
     /**
