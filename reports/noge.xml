@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="cs">
+    <info>
+        <title>Záverečná správa o projekte</title>
+        <subtitle>Desktopová aplikace pro správu videotéky v souboru ve formátu Open Document Spreadsheet</subtitle>
+        <author>
+            <firstname>Juraj</firstname>
+            <surname>Noge</surname>
+        </author>
+    </info>
+    <section>
+        <title>Návrh GUI</title>
+        <para>
+            Grafický návrh rozhrania som riešil pomocou knižnice JavaFX, ktorá je považovaná za moderný štandard pre
+            vývoj desktopových aplikácii v Jave a práca s ňou je v mnohých ohľadoch jednoduchšia oproti starším
+            alternatívam, ako napríklad Swing.
+        </para>
+        <para>
+            Pre základné využitie komponentov som využil populárny nástroj Scene Builder od spoločnosti Gluon, ktorý
+            umožňuje návrh rozhraní WYSIWYG štýlom, pomocou výberu jednotlivých komponentov z menu a ich umiestňovaním
+            na správne miesto iba pomocou myši.
+        </para>
+        <para>
+            Scene Builder navyše návrh vygeneruje v podobe FXML súboru, ktorý patrí do rodiny XML a pomáha k menšiemu
+            rozsahu kódu v aplikácii.
+        </para>
+    </section>
+    <section>
+        <title>Programovanie klienta</title>
+        <para>
+            Po návrhu prišla na rad implementácia chovania sa klienta. Jednotlivé komponenty a ich obslužné metódy
+            definované v FXML súboroch sa dajú do kódu "nainjektovať" pohodlne pomocou anotácie @FXML.
+        </para>
+        <para>
+            Pri implementovaní listenerov, reagujúcich napríklad na stlačenie tlačidiel som využil lambda výrazy, ktoré
+            prišli s Javou 8 a predstavujú ďalšiu výraznú úsporu kódu.
+        </para>
+        <para>
+            Funkcionalitu implementovanú na backende som mal k dispozícii pomocou troch tried - IOUtility, na iniciálne
+            načítanie a uloženie databázy do súboru, CategoryManager, pre správu kategórii filmov a MovieManager pre
+            správu jednotlivých filmov.
+        </para>
+    </section>
+    <section>
+        <title>Riešené problémy</title>
+        <para>
+            Veľkou dilemou pri návrhu architektúry projektu, bol spôsob reprezentácie databáze filmov po tom, čo je
+            načítaná z externého súboru. Prvotný návrh využíval štruktúru slovníka (HashMap), kde kľúč bol názov
+            kategórie a hodnotou samotná kategória, ktorá potom mala ako parameter zoznam filmov, ktoré do nej patria.
+            Tento prístup sa však ukázal byť nepohodlný a viedol k nekonzistencii dát (napríklad pri zmene názvu
+            kategórie). Preto bol zvolený nový prístup a to reprezentácia kategórii ako obyčajnej množiny (HashSet)
+            naprieč všetkými vrstvami.
+        </para>
+        <para>
+            Ďalšou výzvou bolo populovanie JavaFX komponentov, ako napríklad ComboBox, alebo ListView potrebnými dátami
+            a udržiavanie týchto dát v konzistentnom stave (po premenovaní kategórie sa musí nový názov zobraziť vo
+            všetkých možných výberoch). Preto boli implementované metódy updateCategoriesList a updateMoviesList, ktoré
+            po zavolaní
+            transformujú aktuálny zoznam entít na vhodnú textovú reprezentáciu a prepíšu obsah potrebných komponentov.
+        </para>
+        <para>
+            Tretím problémom bola validácia vstupov - napríklad pri dĺžke filmu a roku vydania môžeme akceptovať len
+            číslo, pri statuse zas len určitú množinu hodnôt. Pomocou regulárnych výrazov a change listenerov sa
+            podarilo nastaviť potrebné polia tak, aby sa do nich dali vpísať iba čísla. Ostatné kontroly prebiehajú za
+            behu
+            a uživateľ je na invalidný vstup napríklad pri vyhľadávaní filmov upozornený vhodným chybovým dialógom.
+        </para>
+    </section>
+</article>
