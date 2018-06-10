@@ -40,6 +40,7 @@ public class FinderController {
 
     @FXML
     private void initialize() {
+        tcName.getTableView().setPlaceholder(new Label("No movies match this query"));
         tcName.setCellValueFactory(new PropertyValueFactory<>("name"));
         tcCategory.setCellValueFactory(param -> new ReadOnlyStringWrapper(categoryManager.findCategoryOfMovie(param.getValue()).getName()));
     }
