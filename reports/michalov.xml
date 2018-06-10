@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0" xml:lang="sk">
+    <info>
+          <title>Záverečná správa o projekte</title>
+          <subtitle>Desktopová aplikace pro správu videotéky v souboru ve formátu Open Document Spreadsheet</subtitle>
+          <author>
+              <firstname>Ján</firstname>
+              <surname>Michalov</surname>
+          </author>
+    </info>
+    <section>
+        <title>Návrh a implementácia najnižšej vrstvy (IO)</title>
+        <para>
+            Návrh celej aplikácie spočíval v tom, že budú existovať 3 vrstvy, ktoré budú spolu komunikovať a
+            spolupracovať:
+                1. Práca s ODS súborom (BACKEND)
+                2. Implementácia a API manažérov modelov (BACKEND)
+                3. GUI (FRONTEND)
+        </para>
+        <para>
+            Ja som dostal za úlohu implementovať a navrhnúť API pre najnižšiu vrstvu. Myšlienka bola taká,
+            že jediná vrstva, ktorá bude narábať vnútorne so súbormi (Read/Write) a bude poskytovať oveľa
+            jednoduchšiu reprezentáciu ODS dát bez pomocných knižníc pre vyššie vrstvy.
+        </para>
+        <para>
+            Pre prácu s ODS súbormi som si vybral externú knižnicu Simple API for ODF documents od spoločnosti
+            Apache. Vytváranie a ukladanie súborov do ODS formátu bolo jednoduché a priamočiare, čiže tu som sa
+            nestretol so žiadnými problémami.
+        </para>
+        <para>
+            Posledný bod tejto vrstvy bola transformácia dát do formátu s ktorým by sa jednoducho pracovalo. Zvolili
+            sme ako vhodný formát najprv mapu kategórií, kde kľúč bol meno konkrétnej kategorie, aby sa rýchlo
+            vyhľadávalo. To sa ku koncu zjednodušilo na množinu kategórií, keďže sme zistili, že to nakoniec viedlo ku
+            nekonzistentosti dát. Tu bola nutné podrobné naštudovanie knižnice.
+        </para>
+        <para>
+            Knižnica má veľmi podrobnú a rozsiahlu dokumentáciu, čiže hľadať konkrétnu funkcionalitu nebolo vždy
+            najľahšie. Občas sa mi stalo, že metódy mali nežiadúcu pridanú funkcionalitu, ktorá
+            sa musela ručne ošetrovať. Taktiež sa mi stalo, že metóda, pri ktorej nedávalo zmysel aby vyhadzovala
+            výnimku, ju vyhadzovala a cítil som sa, že ošetrujem situáciu pri ktorej som si bol istý, že sa nestane. Ku
+            koncu som napísal testy aby som overil, že implementácia sa správa podľa dokumentácie. Použil som knižnicu
+            JUnit a AssertJ pre prehľadné testy.
+        </para>
+    </section>
+    <section>
+        <title>Návrh a výpomoc na BACKENDE</title>
+        <para>
+            Celý backend bol navrhnutý spoločnými silami so Slavom a snažili sme sa využiť skúseností zo seminára z
+            programovania v jazyku JAVA (PV168), kde sme riešili takmer identický problém a to návrh aplikačnej logiky.
+            Vybrali sme rovnaký prístup, čiže sme začali s entitami (ktoré navrhol Juro) a API pre manažérov týchto
+            entít. Navrhli sme rozhrania manažérov a spoločne spísali dokumentáciu metód.
+        </para>
+        <para>
+            Ďalší krok bola implementácia a testovanie. Mne sa dostala pod ruky implementácia jednoduchšieho manažéra
+            kategórií. Pri implementácií som nenarazil na takmer žiadne problémy. Jediný problém ktorý nastal, bolo
+            prílišné vyhadzovanie výnimiek, ktoré sa ku koncu buď odstránilo, alebo zjednodušilo. Taktiež sa na konci
+            vymazala zbytočná funkcionalita v podobe napr. metódy updateCategory, ktorá nemala v našej aplikácií využitie.
+        </para>
+    </section>
+    <section>
+        <title>Bugfixing</title>
+        <para>
+            V priebehu vývoja aplikácie sa často menila API a dokumentácia, buď kvôli zbytočnej komplexite, alebo kvôli
+            QOL zmenám.
+        </para>
+        <para>
+            Zmeny často zapríčinili, že sa rozbili testy alebo metódy vyhadzovali nesprávne výnimky. Tieto zmeny znamenali
+            častú údržbu a refactoring, čo bola taktiež moja úloha. Taktiež sme občas museli vymazať pár testov, ktoré
+            ošetrovali chyby pri metódach, ktoré sa počas vývoja označili za zbytočné alebo nepotrebné.
+        </para>
+    </section>
+</article>
