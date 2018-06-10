@@ -33,7 +33,6 @@ public interface CategoryManager {
     /**
      * moves movie from one category to the other
      * @throws IllegalArgumentException if any of parameters are null
-     * @throws IllegalEntityException if any category is not in Map or movie is not in first category
      * @param from category from which the movie is moved
      * @param into category into which the movie is inserted
      * @param movie movie to be moved
@@ -62,7 +61,7 @@ public interface CategoryManager {
      * Finds category of given movie
      *
      * @return category of movie
-     * @parma movie
+     * @param movie of which category we want to find
      */
     Category findCategoryOfMovie(Movie movie);
 }
