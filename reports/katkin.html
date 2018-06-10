@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Záverečná správa o projekte</title><link rel="stylesheet" type="text/css" href="docbook.css"/><meta name="generator" content="DocBook XSL Stylesheets V1.79.1"/></head><body><section xml:lang="cs" class="article" id="idm283720229168"><div class="titlepage"><div><div><h2 class="title">Záverečná správa o projekte</h2></div><div><h3 class="subtitle"><em>Desktopová aplikace pro správu videotéky v souboru ve formátu Open Document Spreadsheet</em></h3></div><div><div class="author"><h3 class="author"><span class="firstname">Slavomír</span> <span class="surname">Katkin</span></h3></div></div></div><hr/></div><div class="toc"><div class="toc-title">Obsah</div><ul class="toc"><li><span class="section"><a href="#idm283720229328">Modely</a></span></li><li><span class="section"><a href="#idm283720224576">Manageri</a></span></li><li><span class="section"><a href="#idm283720219552">Testovanie</a></span></li></ul></div>
+    
+    <section class="section" id="idm283720229328"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Modely</h2></div></div></div>
+        
+        <p>
+            Na reprezentáciu listov v .ods súbore som vytvoril datový model Category. Každý list v súbore je
+            reprezentovaný práve jednou kategóriou. Tá má atribúty "name" (String) a "movies" (Set typu Movie),
+            pričom nemôžu existovať dve kategórie s rovnakým menom.
+        </p>
+        <p>
+            Jednotlivé filmy (pôvodne riadky v tabuľke) sú reprezentované modelom Movie. Pri ňom si pamätáme "name"
+            (String), "length" (int), "status" (Status - enumový typ, možné hodnoty sú AVAIABLE, RENTED a LOST),
+            "releaseYear" (Year) a "actors" (Set typu String). Rovnako ako kategórie, filmy sú unikátne na meno.
+        </p>
+    </section>
+    <section class="section" id="idm283720224576"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Manageri</h2></div></div></div>
+        
+        <p>
+            Pre každý typ existuje aj jeho Manager. CategoryManager si udržuje množinu kategórií a nad tou aj operuje.
+            Pôvodný návrh datovej štruktúry bol slovník (HashMap), kde kľúč bol meno kategórie a hodnotou kategória
+            samotná, no tento návrh sa ukázal ako zbytočne zložitý a nekonzistentný (zmena názvu). Kvôli jednoduchosti
+            bol nahradený množinou. Okrem klasických operácií (create, delete, find) umožňuje CategoryManager aj
+            presúvanie filmov medzi jednotlivými kategóriami.
+        </p>
+        <p>
+            Na rozdiel od CategoryManagera, MovieManager si žiadne data nedrží (dal by sa vyhlásiť za statickú triedu).
+            Vždy pri volaní jeho funkcií je mu daná kategória, z ktorej si vyberie jej množinou filmov, alebo rovno
+            množina samotná. MovieManager taktiež implementuje klasické operácie, plus vyhľadávanie podľa jednotlivých
+            atribútov a vyhľadanie kategórie ku konkrétnemu filmu.
+        </p>
+    </section>
+    <section class="section" id="idm283720219552"><div class="titlepage"><div><div><h2 class="title" style="clear: both">Testovanie</h2></div></div></div>
+        
+        <p>
+            Ku každému managerovi som napísal sadu jednotkových testov. Testovaná je konzistencia dát pri používaní
+            jednotlivých funckií a vyhodenie správnych výnimok pri nežiadaných situáciach. Využitá je aj vlastná výnimka.
+            ValidationException sa vyhadzuje v prípade, že hociktorá z atribút má nullovú hodnotu. Nullové vstupy sa
+            riešia pomocou IllegalArgumentException.
+        </p>
+        <p>
+            Pri testoch boli pre zjednodušenie vytvárania testovacích objektov použité triedy CategoryBuilder a
+            MovieBuilder. Tieto buildre umožňujú jednoduché a prehľadné nastavenie atribútov pred vytvorením objektu.
+            Vďaka tomu som sa vyhol volaniu Set funkcií v každom teste.
+        </p>
+    </section>
+</section></body></html>
