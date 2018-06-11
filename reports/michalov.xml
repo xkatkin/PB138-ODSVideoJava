@@ -47,8 +47,8 @@
         <para>
             Celý backend bol navrhnutý spoločnými silami so Slavom a snažili sme sa využiť skúseností zo seminára z
             programovania v jazyku JAVA (PV168), kde sme riešili takmer identický problém a to návrh aplikačnej logiky.
-            Vybrali sme rovnaký prístup, čiže sme začali s entitami (ktoré navrhol Juro) a API pre manažérov týchto
-            entít. Navrhli sme rozhrania manažérov a spoločne spísali dokumentáciu metód.
+            Vybrali sme rovnaký prístup, čiže sme začali s entitami a API pre manažérov týchto entít. Navrhli sme 
+            rozhrania manažérov a spoločne spísali dokumentáciu metód.
         </para>
         <para>
             Ďalší krok bola implementácia a testovanie. Mne sa dostala pod ruky implementácia jednoduchšieho manažéra
